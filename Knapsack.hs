@@ -13,14 +13,8 @@ import qualified Data.Vector as V
 {- TODO:
 talk about
     lazy vs strict in Solution
-    making safeMaximum strict basically eliminiated all the Solutions on the stack
+    making safeMaximum strict basically eliminiated all the Solutions on the heap
 use criteron to compare the lazy vs strict versions on the SAME problem
-
-ALLOCATION:
-    Int
-    Integer
-    (,)
-    (*)
 
 COST CENTRE                  MODULE  %time %alloc
 
@@ -35,7 +29,10 @@ type Selection = I.IntMap Int
 newtype Value = V {unV :: Int} deriving (Eq, Ord, Num, Real, Enum, Integral, Show)
 newtype Weight = W {unW :: Int} deriving (Eq, Ord, Num, Real, Enum, Integral, Show)
 
-data Solution = Solution {selection :: !Selection, totalValue :: !Value, totalWeight :: !Weight}
+data Solution = Solution {
+    selection :: !Selection,
+    totalValue :: {-# UNPACK #-} !Value,
+    totalWeight :: {-# UNPACK #-} !Weight}
     deriving (Eq, Show)
 
 emptySoln = Solution I.empty 0 0
