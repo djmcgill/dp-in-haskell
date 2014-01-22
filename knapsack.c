@@ -71,13 +71,11 @@ solution knapsack (int cap, int n, int* values, int* weights) {
 		// gcdWeights gcd= weights[i]; sadly doesn't work :(
 		gcdWeights = gcd (gcdWeights, weights[i]);
 	}
-
 	// scale the weights by their gcd
 	cap /= gcdWeights;
 	for (i = 0; i < n; i++) {
 		weights[i] /= gcdWeights;
 	}
-
 	// make an array of size (cap+1) where the ith element is the best solution for a weight of i
 	solution* solutions = malloc((cap+1)*sizeof(solution));
 	solutions[0] = (solution){0,0,empty_selection()};
@@ -117,21 +115,23 @@ solution knapsack (int cap, int n, int* values, int* weights) {
 			}
 		}
 
-		assert (best_j != -1 && best_position != -1);
-
 		// update solutions[i]
 		solutions[i].total_value = best_value;
 		solutions[i].total_weight = best_weight;
 
 		// copy over the selection hashmap (including each selection)
 		solutions[i].sol_selection = empty_selection();
-		selection* s;
-		for (s = *(solutions[best_position].sol_selection); s != NULL; s=s->hh.next) {
-			selection* new_s = malloc(sizeof(selection));
-			*new_s = *s;
-			HASH_ADD_INT (*(solutions[i].sol_selection), position, new_s);
-		}
+
+		if (best_j != -1 && best_position != -1) {
+			// if we have a new position, copy over the old selection and increment the position
+			selection* s;
+			for (s = *(solutions[best_position].sol_selection); s != NULL; s=s->hh.next) {
+				selection* new_s = malloc(sizeof(selection));
+				*new_s = *s;
+				HASH_ADD_INT (*(solutions[i].sol_selection), position, new_s);
+			}
 		increment_position(solutions[i].sol_selection, best_j);
+		}
 	}
 
 	solution bestAns = solutions[cap];
@@ -148,10 +148,10 @@ solution knapsack (int cap, int n, int* values, int* weights) {
 
 main () {
 	//TODO: read in the problem and populate these values:
-	int cap = 5;
+	int cap = 15;
 	int n = 3;
 	int values[3] = {2,1,7};
-	int weights[3] = {1,2,3};
+	int weights[3] = {3,6,9};
 
 	solution bestAns;
 	bestAns = knapsack (cap, n, values, weights);
