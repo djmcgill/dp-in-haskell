@@ -14,15 +14,7 @@ import qualified Data.Vector as V
 talk about
     lazy vs strict in Solution
     making safeMaximum strict basically eliminiated all the Solutions on the heap
-use criteron to compare the lazy vs strict versions on the SAME problem
 
-COST CENTRE                  MODULE  %time %alloc
-
-knapsackScaled.genI.eachPair Main     45.9   30.1
-knapsackScaled.genI          Main     38.3   67.9
-compare                      Main      6.7    0.0
-safeMaximum                  Main      5.3    0.0
-egRandom                     Main      3.0    1.4
 -}
 
 type Selection = I.IntMap Int
@@ -30,28 +22,19 @@ newtype Value = V {unV :: Int} deriving (Eq, Ord, Num, Real, Enum, Integral, Sho
 newtype Weight = W {unW :: Int} deriving (Eq, Ord, Num, Real, Enum, Integral, Show)
 
 data Solution = Solution {
-    selection :: !Selection,
+    selection :: Selection,
     totalValue :: {-# UNPACK #-} !Value,
     totalWeight :: {-# UNPACK #-} !Weight}
     deriving (Eq, Show)
 
 emptySoln = Solution I.empty 0 0
 
+-- XXX: if same value, then the least weight
 instance Ord Solution where
     compare = comparing totalValue
-{-
-main = print =<< egRandom (10000 :: Int)
 
-egRandom n = do
-    (cap:xs) <- randomRs (1,1000 :: Int) `fmap` newStdGen
-    let vws = take n $ pair xs
-    return (solve vws cap)
-    where
-    pair :: [a] -> [(a,a)]
-    pair (x1:x2:xs) = (x1,x2) : pair xs
-    pair _ = []
--}
--- | Given a list of (Value, Weight) pairs, maximises the total value
+
+-- | Given a list of (Value, Weight) pairs (where the weights are positive), maximises the total value
 --   while keeping the total weight under the capacity.
 solve :: [(Int, Int)] -> Int -> (I.IntMap Int, Int, Int)
 solve vws cap = (s, v, w)
