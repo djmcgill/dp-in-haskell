@@ -6,7 +6,8 @@ import           Control.Arrow       (second, (***))
 import qualified Data.IntMap.Strict as I
 import           Data.List           (foldl')
 import           Data.Maybe          (catMaybes)
-import           Data.Ord            (comparing)
+import           Data.Monoid         ((<>))
+import           Data.Ord            (comparing, Down(..))
 import           System.Random
 import qualified Data.Vector as V
 
@@ -29,10 +30,9 @@ data Solution = Solution {
 
 emptySoln = Solution I.empty 0 0
 
--- XXX: if same value, then the least weight
+-- the best solution has the highest value or, in the case of a draw, the lowest weight
 instance Ord Solution where
-    compare = comparing totalValue
-
+    compare = comparing totalValue <> comparing (Down . totalWeight)
 
 -- | Given a list of (Value, Weight) pairs (where the weights are positive), maximises the total value
 --   while keeping the total weight under the capacity.
@@ -57,12 +57,9 @@ knapsackScaled vws (W cap) = solns V.! cap
 
     genI :: Int -> Solution
     genI 0 = emptySoln
-    genI !i = safeMaximum $ catMaybes $ V.toList $ V.imap eachPair vws
+    genI !i = foldl' max emptySoln $ catMaybes $ V.toList $ V.imap eachPair vws -- possibly remove the intermediate list here?
         where
         eachPair :: Int -> (Value, Weight) -> Maybe Solution
         eachPair !j (v, w) | unW w <= i = case solns V.! (i - unW w) of
             Solution s' v' w' -> Just $ Solution (I.insertWith (+) j 1 s') (v' + v) (w' + w)
         eachPair _ _ = Nothing
-
-safeMaximum :: [Solution] -> Solution
-safeMaximum = foldl' max emptySoln
