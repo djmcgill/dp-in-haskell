@@ -142,19 +142,29 @@ solution knapsack (int cap, int n, int* values, int* weights) {
 		cleanup_selection(solutions[i].sol_selection);
 	}
 	free (solutions);
-
 	return bestAns;
 }
 
-main () {
-	//TODO: read in the problem and populate these values:
-	int cap = 15;
-	int n = 3;
-	int values[3] = {2,1,7};
-	int weights[3] = {3,6,9};
-
+int main () {
+	int cap, n, i = 0;
+	int *values, *weights;
+	FILE *pFile;
 	solution bestAns;
+
+	pFile = fopen ("test_problem_1.data","r");
+	fscanf (pFile, "%i %i\n", &cap, &n);
+
+	values = malloc (n*sizeof(int));
+	weights = malloc (n*sizeof(int));
+
+	for (i = 0; i < n; i++) {
+		fscanf(pFile, "%i %i\n", values + i, weights + i);
+	}
+	fclose(pFile);
+
 	bestAns = knapsack (cap, n, values, weights);
+	free (weights);
+    free (values);
 
 	printf ("The solution is has a total weight of %i, a total value of %i and a selection of:\n",
 		bestAns.total_weight, bestAns.total_value);
