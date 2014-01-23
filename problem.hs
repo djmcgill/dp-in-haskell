@@ -22,7 +22,7 @@ writeLines n filename = do
     let (cap, gen') = randomR (minR, maxR) gen
     let cap' = show (10*cap)
     let xs = map show (randomRs (minR, maxR) gen')
-    writeFile filename (unlines (cap' : take n (pair xs)))
+    writeFile filename $ unlines $ (cap' ++ " " ++ show n) : take n (pair xs)
 
     where
     pair :: [String] -> [String]

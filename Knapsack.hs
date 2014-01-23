@@ -3,7 +3,7 @@
 module Knapsack (solve) where
 
 import           Control.Arrow       (second, (***))
-import qualified Data.IntMap.Strict as I
+import qualified Data.IntMap.Lazy as I -- TODO: benchmark being strict
 import           Data.List           (foldl')
 import           Data.Maybe          (catMaybes)
 import           Data.Monoid         ((<>))

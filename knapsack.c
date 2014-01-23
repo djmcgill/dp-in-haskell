@@ -1,81 +1,68 @@
 #include<stdio.h>
 #include<assert.h>
 
-#include "uthash.h"
+#include "uthash-master/src/uthash.h"
+#include "gcd.c"
+#include "knapsack.h"
 
-typedef struct selection {
-	int position;
-	int quantity;
-	UT_hash_handle hh;
-} selection;
+int main () {
+	int cap = 0, n = 0, i = 0;
+	int *values = NULL, *weights = NULL;
+	solution bestAns;
+	char* FILE_NAME = "test_problem_1.data";
+	
+	read_file(FILE_NAME, &cap, &n, values, weights);
+	
+	bestAns = knapsack (cap, n, values, weights);
+	free (weights);
+    free (values);
 
-typedef struct solution {
-	int total_value;
-	int total_weight;
-	selection** sol_selection;
-} solution;
+	printf ("The solution is has a total weight of %i, a total value of %i and a selection of:\n",
+		bestAns.total_weight, bestAns.total_value);
 
-// XXX: is this really the best way to go about it?
-int gcd (int a, int b) {
-	int t;
-	while (b != 0) {
-		t = b;
-		b = a % b;
-		a = t;
-	}
-	return a;
-}
-
-// (destructively) increment the quantity at a position in a hashmap
-void increment_position(selection **selections, int position_) {
-	selection *s;
-	HASH_FIND_INT(*selections, &position_, s);
-
-	// the position wasn't there, add it
-	if (s == NULL) {
-		s = malloc(sizeof(selection));
-		s->position = position_;
-		s->quantity = 1;
-		HASH_ADD_INT (*selections, position, s);
-
-	// the position was there, increment its quantity
-	} else {
-		s->quantity += 1;
-	}
-}
-
-selection** empty_selection() {
-	selection** ss = malloc(sizeof(selection*));
-	*ss = NULL;
-	return ss;
-}
-
-void cleanup_selection(selection **selections) {
 	selection *current_selection, *tmp;
 
-  	HASH_ITER(hh, *selections, current_selection, tmp) {
-    	HASH_DEL(*selections,current_selection);
-    	free(current_selection);
-    }
-    free (selections);
+	// print answers
+	HASH_ITER(hh, *(bestAns.sol_selection), current_selection, tmp) {
+		printf ("\tindex: %i, quantity: %i\n", current_selection->position, current_selection->quantity);
+	}
+
+	// free sol_selection
+	HASH_ITER(hh, *(bestAns.sol_selection), current_selection, tmp) {
+		HASH_DEL(*(bestAns.sol_selection), current_selection);
+		free (current_selection);
+	}
+	free (bestAns.sol_selection);
+	return 0;
 }
 
-solution knapsack (int cap, int n, int* values, int* weights) {
+void read_file (char* file_name, int* pCap, int* pN, int values[], int weights[]) {
+	FILE *pFile;
+	int i = 0;
+
+	pFile = fopen ("test_problem_1.data","r");
+	fscanf (pFile, "%i %i\n", pCap, pN);
+	assert (*pN > 0 && *pCap >= 0);
+
+	values = malloc (*pN *sizeof(int));
+	weights = malloc (*pN *sizeof(int));
+
+	for (i = 0; i < *pN; i++) {
+		fscanf(pFile, "%i %i\n", values + i, weights + i);
+		assert (values[i] >= 0 && weights[i] > 0);
+	}
+	fclose(pFile);
+}
+
+solution knapsack(int cap, size_t n,
+                  int weights[restrict static n],
+                  int values[restrict static n]) {
 	// assuming that len(values) == len (weights) == n
 	int i = 0;
 	int j = 0;
 
-	// find the gcd of all of the weights (foldl gcd cap weights)
-	int gcdWeights = cap;
-	for (i = 0; i < n; i++) {
-		// gcdWeights gcd= weights[i]; sadly doesn't work :(
-		gcdWeights = gcd (gcdWeights, weights[i]);
-	}
-	// scale the weights by their gcd
-	cap /= gcdWeights;
-	for (i = 0; i < n; i++) {
-		weights[i] /= gcdWeights;
-	}
+	int gcdWeights = scale_by_gcd(&cap, n, weights);
+
 	// make an array of size (cap+1) where the ith element is the best solution for a weight of i
 	solution* solutions = malloc((cap+1)*sizeof(solution));
 	solutions[0] = (solution){0,0,empty_selection()};
@@ -145,44 +132,56 @@ solution knapsack (int cap, int n, int* values, int* weights) {
 	return bestAns;
 }
 
-int main () {
-	int cap, n, i = 0;
-	int *values, *weights;
-	FILE *pFile;
-	solution bestAns;
+int scale_by_gcd (int* capP, size_t n,
+                  int weights[restrict static n]) {
+	int i = 0, gcdWeights;
 
-	pFile = fopen ("test_problem_1.data","r");
-	fscanf (pFile, "%i %i\n", &cap, &n);
-
-	values = malloc (n*sizeof(int));
-	weights = malloc (n*sizeof(int));
-
+	// find the gcd of all of the weights (foldl' gcd cap weights)
+	gcdWeights = *capP;
 	for (i = 0; i < n; i++) {
-		fscanf(pFile, "%i %i\n", values + i, weights + i);
-	}
-	fclose(pFile);
-
-	bestAns = knapsack (cap, n, values, weights);
-	free (weights);
-    free (values);
-
-	printf ("The solution is has a total weight of %i, a total value of %i and a selection of:\n",
-		bestAns.total_weight, bestAns.total_value);
-
-	selection *current_selection, *tmp;
-
-	// print answers
-	HASH_ITER(hh, *(bestAns.sol_selection), current_selection, tmp) {
-		printf ("\tindex: %i, quantity: %i\n", current_selection->position, current_selection->quantity);
+		// gcdWeights gcd= weights[i]; sadly doesn't work :(
+		gcdWeights = gcd (gcdWeights, weights[i]);
 	}
 
-	// free sol_selection
-	HASH_ITER(hh, *(bestAns.sol_selection), current_selection, tmp) {
-		HASH_DEL(*(bestAns.sol_selection), current_selection);
-		free (current_selection);
+	// scale the weights by their gcd
+	*capP /= gcdWeights;
+	
+	for (i = 0; i < n; i++) {
+		weights[i] /= gcdWeights;
 	}
-	free (bestAns.sol_selection);
-	return 0;
+	return gcdWeights;
 }
 
+selection** empty_selection() {
+	selection** ss = malloc(sizeof(selection*));
+	*ss = NULL;
+	return ss;
+}
 
+void cleanup_selection(selection **selections) {
+	selection *current_selection, *tmp;
+
+  	HASH_ITER(hh, *selections, current_selection, tmp) {
+    	HASH_DEL(*selections,current_selection);
+    	free(current_selection);
+    }
+    free (selections);
+}
+
+// (destructively) increment the quantity at a position in a hashmap
+void increment_position(selection **selections, int position_) {
+	selection *s;
+	HASH_FIND_INT(*selections, &position_, s);
+
+	// the position wasn't there, add it
+	if (s == NULL) {
+		s = malloc(sizeof(selection));
+		s->position = position_;
+		s->quantity = 1;
+		HASH_ADD_INT (*selections, position, s);
+
+	// the position was there, increment its quantity
+	} else {
+		s->quantity += 1;
+	}
+}
