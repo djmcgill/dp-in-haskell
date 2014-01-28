@@ -14,7 +14,7 @@ typedef struct solution {
 } solution;
 
 solution    knapsack          (int, size_t, int[], int[]);
-void        read_file         (char*, int*, int*, int[], int[]);
+void        read_file         (const char*, int*, int*, int**, int**);
 int         scale_by_gcd      (int*, size_t, int[]);
 
 void        increment_position(selection**, int);
