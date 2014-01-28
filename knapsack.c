@@ -10,19 +10,18 @@ int main () {
 	int *values = NULL, *weights = NULL;
 	solution bestAns;
 	char* FILE_NAME = "test_problem_1.data";
-	
-	read_file(FILE_NAME, &cap, &n, values, weights);
-	
+
+	read_file(FILE_NAME, &cap, &n, &values, &weights);
+
 	bestAns = knapsack (cap, n, values, weights);
 	free (weights);
     free (values);
 
+	// print answers
 	printf ("The solution is has a total weight of %i, a total value of %i and a selection of:\n",
 		bestAns.total_weight, bestAns.total_value);
 
 	selection *current_selection, *tmp;
-
-	// print answers
 	HASH_ITER(hh, *(bestAns.sol_selection), current_selection, tmp) {
 		printf ("\tindex: %i, quantity: %i\n", current_selection->position, current_selection->quantity);
 	}
@@ -36,7 +35,11 @@ int main () {
 	return 0;
 }
 
-void read_file (char* file_name, int* pCap, int* pN, int values[], int weights[]) {
+void read_file (const char* const file_name,
+	            int* pCap,
+	            int* pN,
+	            int** restrict pValues,
+	            int** restrict pWeights) {
 	FILE *pFile;
 	int i = 0;
 
@@ -44,12 +47,13 @@ void read_file (char* file_name, int* pCap, int* pN, int values[], int weights[]
 	fscanf (pFile, "%i %i\n", pCap, pN);
 	assert (*pN > 0 && *pCap >= 0);
 
-	values = malloc (*pN *sizeof(int));
-	weights = malloc (*pN *sizeof(int));
+	pValues = malloc (*pN *sizeof(int));
+	pWeights = malloc (*pN *sizeof(int));
 
 	for (i = 0; i < *pN; i++) {
-		fscanf(pFile, "%i %i\n", values + i, weights + i);
-		assert (values[i] >= 0 && weights[i] > 0);
+		fscanf (pFile, "%i %i\n", *pValues + i, *pWeights + i);
+		assert (*pValues[i] >= 0 && *pWeights[i] > 0);
+
 	}
 	fclose(pFile);
 }
@@ -145,7 +149,7 @@ int scale_by_gcd (int* capP, size_t n,
 
 	// scale the weights by their gcd
 	*capP /= gcdWeights;
-	
+
 	for (i = 0; i < n; i++) {
 		weights[i] /= gcdWeights;
 	}
