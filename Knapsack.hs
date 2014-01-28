@@ -14,8 +14,6 @@ import qualified Data.Vector as V
 {- TODO:
 talk about
     lazy vs strict in Solution
-    making safeMaximum strict basically eliminiated all the Solutions on the heap
-
 -}
 
 type Selection = I.IntMap Int
@@ -44,7 +42,7 @@ knapsackNative :: V.Vector (Value, Weight) -> Weight -> Solution
 knapsackNative vws cap = unscale $ knapsackScaled (V.map (second scale) vws) (scale cap)
     where
     -- the gcd of the weights
-    gcdW = V.foldl1' gcd $ V.map snd vws
+    gcdW = V.foldl' gcd cap $ V.map snd vws -- is this fused?
     scale x = div x gcdW
     unscale (Solution s v w) = Solution s v (w*gcdW)
 
@@ -61,5 +59,5 @@ knapsackScaled vws (W cap) = solns V.! cap
         where
         eachPair :: Int -> (Value, Weight) -> Maybe Solution
         eachPair !j (v, w) | unW w <= i = case solns V.! (i - unW w) of
-            Solution s' v' w' -> Just $ Solution (I.insertWith (+) j 1 s') (v' + v) (w' + w)
+            Solution s' !v' !w' -> Just $ Solution (I.insertWith (+) j 1 s') (v' + v) (w' + w)
         eachPair _ _ = Nothing
