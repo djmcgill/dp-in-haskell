@@ -8,8 +8,9 @@ import           Data.List           (foldl')
 import           Data.Maybe          (catMaybes)
 import           Data.Monoid         ((<>))
 import           Data.Ord            (comparing, Down(..))
-import           System.Random
 import qualified Data.Vector as V
+
+import Debug.Trace
 
 {- TODO:
 talk about
@@ -39,8 +40,9 @@ solve vws cap = (s, v, w)
     where Solution s (V v) (W w) = knapsackNative (V.fromList $ map (V *** W) vws) (W cap)
 
 knapsackNative :: V.Vector (Value, Weight) -> Weight -> Solution
-knapsackNative vws cap = unscale $ knapsackScaled (V.map (second scale) vws) (scale cap)
+knapsackNative vws cap = traceShow gcdW $ unscale $ knapsackScaled vws' (scale cap)
     where
+    vws' = if gcdW == 1 then (V.map (second scale) vws) else vws
     -- the gcd of the weights
     gcdW = V.foldl' gcd cap $ V.map snd vws -- is this fused?
     scale x = div x gcdW
