@@ -5,8 +5,15 @@
 #include "gcd.c"
 #include "knapsack.h"
 
+/*
+gcd = 1
+The solution is has a total weight of 7036, a total value of 68202 and a selection of:
+        index: 5252, quantity: 6
+        index: 4192, quantity: 64
+*/
+
 int main () {
-	int cap = 0, n = 0, i = 0;
+	int cap = 0, n = 0;
 	int *values = NULL, *weights = NULL;
 	solution bestAns;
 	char* FILE_NAME = "test_problem_1.data";
@@ -16,7 +23,6 @@ int main () {
 	bestAns = knapsack (cap, n, values, weights);
 	free (weights);
     free (values);
-
 	// print answers
 	printf ("The solution is has a total weight of %i, a total value of %i and a selection of:\n",
 		bestAns.total_weight, bestAns.total_value);
@@ -25,7 +31,6 @@ int main () {
 	HASH_ITER(hh, *(bestAns.sol_selection), current_selection, tmp) {
 		printf ("\tindex: %i, quantity: %i\n", current_selection->position, current_selection->quantity);
 	}
-
 	// free sol_selection
 	HASH_ITER(hh, *(bestAns.sol_selection), current_selection, tmp) {
 		HASH_DEL(*(bestAns.sol_selection), current_selection);
@@ -42,18 +47,17 @@ void read_file (const char* const file_name,
 	            int** restrict pWeights) {
 	FILE *pFile;
 	int i = 0;
-
 	pFile = fopen ("test_problem_1.data","r");
 	fscanf (pFile, "%i %i\n", pCap, pN);
 	assert (*pN > 0 && *pCap >= 0);
 
-	pValues = malloc (*pN *sizeof(int));
-	pWeights = malloc (*pN *sizeof(int));
-
-	for (i = 0; i < *pN; i++) {
+	int n = *pN;
+	assert (n >= 0);
+	*pValues = malloc (n * sizeof(int));
+	*pWeights = malloc (n * sizeof(int));
+	for (i = 0; i < n; i++) {
 		fscanf (pFile, "%i %i\n", *pValues + i, *pWeights + i);
-		assert (*pValues[i] >= 0 && *pWeights[i] > 0);
-
+		assert ((*pValues)[i] >= 0 && (*pWeights)[i] > 0);
 	}
 	fclose(pFile);
 }
@@ -146,12 +150,15 @@ int scale_by_gcd (int* capP, size_t n,
 		// gcdWeights gcd= weights[i]; sadly doesn't work :(
 		gcdWeights = gcd (gcdWeights, weights[i]);
 	}
+	printf ("gcd = %i", gcdWeights);
 
-	// scale the weights by their gcd
-	*capP /= gcdWeights;
+	if (gcdWeights != 1) {
+		// scale the weights by their gcd
+		*capP /= gcdWeights;
 
-	for (i = 0; i < n; i++) {
-		weights[i] /= gcdWeights;
+		for (i = 0; i < n; i++) {
+			weights[i] /= gcdWeights;
+		}
 	}
 	return gcdWeights;
 }
