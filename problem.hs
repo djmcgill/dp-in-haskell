@@ -7,7 +7,9 @@ minR, maxR :: Int
 minR = 100
 maxR = 1000
 
-main = maybe printUsage (uncurry writeLines) =<< parseArgs `fmap` getArgs
+main = do
+    args <- getArgs
+    maybe printUsage (uncurry writeLines) (parseArgs args)
 
 printUsage = putStrLn "Usage: <executable> <number of items> <filename>"
 
