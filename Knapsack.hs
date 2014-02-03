@@ -10,8 +10,6 @@ import           Data.Monoid         ((<>))
 import           Data.Ord            (comparing, Down(..))
 import qualified Data.Vector as V
 
-import Debug.Trace
-
 {- TODO:
 talk about
     lazy vs strict in Solution
@@ -40,10 +38,9 @@ solve vws cap = (s, v, w)
     where Solution s (V v) (W w) = knapsackNative (V.fromList $ map (V *** W) vws) (W cap)
 
 knapsackNative :: V.Vector (Value, Weight) -> Weight -> Solution
-knapsackNative vws cap = traceShow gcdW $ unscale $ knapsackScaled vws' (scale cap)
+knapsackNative vws cap = unscale $ knapsackScaled vws' (scale cap)
     where
-    vws' = if gcdW == 1 then (V.map (second scale) vws) else vws
-    -- the gcd of the weights
+    vws' = if gcdW /= 1 then (V.map (second scale) vws) else vws
     gcdW = V.foldl' gcd cap $ V.map snd vws -- is this fused?
     scale x = div x gcdW
     unscale (Solution s v w) = Solution s v (w*gcdW)
