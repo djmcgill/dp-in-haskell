@@ -10,6 +10,8 @@ gcd = 1
 The solution is has a total weight of 7036, a total value of 68202 and a selection of:
         index: 5252, quantity: 6
         index: 4192, quantity: 64
+
+
 */
 
 int main () {
@@ -24,7 +26,7 @@ int main () {
 	free (weights);
     free (values);
 	// print answers
-	printf ("The solution is has a total weight of %i, a total value of %i and a selection of:\n",
+	printf ("\nThe C solution is has a total weight of %i, a total value of %i and a selection of:\n",
 		bestAns.total_weight, bestAns.total_value);
 
 	selection *current_selection, *tmp;
@@ -63,8 +65,8 @@ void read_file (const char* const file_name,
 }
 
 solution knapsack(int cap, size_t n,
-                  int weights[restrict static n],
-                  int values[restrict static n]) {
+                  int values[restrict static n],
+                  int weights[restrict static n]) {
 	// assuming that len(values) == len (weights) == n
 	int i = 0;
 	int j = 0;
@@ -150,7 +152,6 @@ int scale_by_gcd (int* capP, size_t n,
 		// gcdWeights gcd= weights[i]; sadly doesn't work :(
 		gcdWeights = gcd (gcdWeights, weights[i]);
 	}
-	printf ("gcd = %i", gcdWeights);
 
 	if (gcdWeights != 1) {
 		// scale the weights by their gcd
