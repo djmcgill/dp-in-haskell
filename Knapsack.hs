@@ -94,7 +94,7 @@ knapsackScaled vws (W cap) = solns V.! cap
                 where
                 eachPair :: Int -> (Value, Weight) -> Maybe Solution
                 eachPair !j (v, w) | unW w <= i = case solns V.! (i - unW w) of
-                    Solution s' v' w' -> Just $ Solution (insertIndex j s') (v' + v) (w' + w)
+                    Solution s' v' w' -> Just $ Solution (addIndex j s') (v' + v) (w' + w)
                 eachPair _ _ = Nothing
 
                 maxMaybe s sM = maybe id max sM s
