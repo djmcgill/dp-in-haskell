@@ -44,12 +44,15 @@ readProblem filename = do
     where
     makeVW v w = (V v, W w)
 
-
+-- TODO: test [Int] vs IntMap Int
 type Selection = [Int]
+emptySelection = []
+addIndex :: Int -> Selection -> Selection
+addIndex = (:)
 
+-- set up the newtypes including unboxed vectors of them
 newtype Value = V {unV :: Int} deriving (Eq, Ord, Num, Real, Enum, Integral, Show, U.Unbox)
 newtype Weight = W {unW :: Int} deriving (Eq, Ord, Num, Real, Enum, Integral, Show, U.Unbox)
-
 deriving instance (B.Vector U.Vector Value)
 deriving instance (M.MVector UM.MVector Value)
 deriving instance (B.Vector U.Vector Weight)
@@ -67,7 +70,7 @@ instance Ord Solution where
     compare = comparing totalValue <> comparing (Down . totalWeight)
 
 emptySoln :: Solution
-emptySoln = Solution [] 0 0
+emptySoln = Solution emptySelection 0 0
 
 knapsackNative :: U.Vector (Value, Weight) -> Weight -> Solution
 knapsackNative vws cap = unscale $ knapsackScaled vws' (scale cap)
@@ -91,7 +94,7 @@ knapsackScaled vws (W cap) = solns V.! cap
                 where
                 eachPair :: Int -> (Value, Weight) -> Maybe Solution
                 eachPair !j (v, w) | unW w <= i = case solns V.! (i - unW w) of
-                    Solution s' v' w' -> Just $ Solution (j:s') (v' + v) (w' + w)
+                    Solution s' v' w' -> Just $ Solution (insertIndex j s') (v' + v) (w' + w)
                 eachPair _ _ = Nothing
 
                 maxMaybe s sM = maybe id max sM s
