@@ -7,11 +7,11 @@ import           Control.Applicative
 import           Control.Monad
 import           Data.Attoparsec.ByteString.Lazy
 import           Data.Attoparsec.ByteString.Char8 hiding (eitherResult, parse, skipWhile, takeWhile1)
-import qualified Data.ByteString.Lazy as B
-import qualified Data.IntMap.Strict as I
-import           Data.List (foldl')
-import           Data.Monoid           ((<>))
-import           Data.Ord              (comparing, Down(..))
+import qualified Data.ByteString.Lazy             as B
+import qualified Data.IntMap.Strict               as I
+import           Data.List
+import           Data.Monoid
+import           Data.Ord
 import qualified Data.Vector as V
 import qualified Data.Vector.Unboxed as U
 import qualified Data.Vector.Unboxed.Mutable as UM
