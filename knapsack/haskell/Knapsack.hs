@@ -2,7 +2,7 @@
              MultiParamTypeClasses #-}
 
 
-import           Control.Arrow         (second)
+import           Control.Arrow                    (second)
 import           Control.Applicative
 import           Control.Monad
 import           Data.Attoparsec.ByteString.Lazy
@@ -12,11 +12,11 @@ import qualified Data.IntMap.Strict               as I
 import           Data.List
 import           Data.Monoid
 import           Data.Ord
-import qualified Data.Vector as V
-import qualified Data.Vector.Unboxed as U
-import qualified Data.Vector.Unboxed.Mutable as UM
-import qualified Data.Vector.Generic.Base as B
-import qualified Data.Vector.Generic.Mutable as M
+import qualified Data.Vector                      as V
+import qualified Data.Vector.Unboxed              as U
+import qualified Data.Vector.Unboxed.Mutable      as UM
+import qualified Data.Vector.Generic.Base         as B
+import qualified Data.Vector.Generic.Mutable      as M
 import           Text.Printf
 
 main = do
@@ -24,7 +24,7 @@ main = do
     let Solution s (V v) (W w) = knapsackNative (U.fromListN n vws) cap
 
     printf "\nThe Haskell solution is has a total weight of %i, a total value of %i and a selection of:\n" w v
-    forM_ (I.toList (countMap s)) $ uncurry (printf "\tindex: %i, quantity: %i\n")
+    forM_ (I.toList (countMap s)) (uncurry (printf "\tindex: %i, quantity: %i\n"))
 
     where
     countMap :: [Int] -> I.IntMap Int
@@ -39,16 +39,10 @@ readProblem filename = do
         space
         n <- decimal
         endOfLine
-        vws <- many $ (makeVW <$> (decimal <* space) <*> decimal <* endOfLine)
+        vws <- many $ (makeVW <$> decimal <* space <*> decimal <* endOfLine)
         return (W cap, n, vws)
     where
     makeVW v w = (V v, W w)
-
--- TODO: test [Int] vs IntMap Int
-type Selection = [Int]
-emptySelection = []
-addIndex :: Int -> Selection -> Selection
-addIndex = (:)
 
 -- set up the newtypes including unboxed vectors of them
 newtype Value = V {unV :: Int} deriving (Eq, Ord, Num, Real, Enum, Integral, Show, U.Unbox)
@@ -58,6 +52,11 @@ deriving instance (M.MVector UM.MVector Value)
 deriving instance (B.Vector U.Vector Weight)
 deriving instance (M.MVector UM.MVector Weight)
 
+-- TODO: test [Int] vs IntMap Int
+type Selection = [Int]
+emptySelection = []
+addIndex :: Int -> Selection -> Selection
+addIndex = (:)
 
 data Solution = Solution {
     selection :: Selection,
@@ -73,10 +72,10 @@ emptySoln :: Solution
 emptySoln = Solution emptySelection 0 0
 
 knapsackNative :: U.Vector (Value, Weight) -> Weight -> Solution
-knapsackNative vws cap = unscale $ knapsackScaled vws' (scale cap)
+knapsackNative vws cap = unscale $ knapsackScaled (scaleV vws) (scale cap)
     where
-    vws' = if gcdW /= 1 then (U.map (second scale) vws) else vws
-    gcdW = U.foldl' gcd cap $ U.map snd vws
+    scaleV  = if gcdW /= 1 then U.map (second scale) else id
+    gcdW    = U.foldl' gcd cap $ U.map snd vws
     scale x = div x gcdW
     unscale (Solution s v w) = Solution s v (w*gcdW)
 
