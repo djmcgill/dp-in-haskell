@@ -1,23 +1,60 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, BangPatterns #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, BangPatterns, LambdaCase, StandaloneDeriving,
+             MultiParamTypeClasses #-}
 
-module Knapsack (solve) where
 
-import           Control.Arrow       (second, (***))
-import qualified Data.IntMap.Lazy as I -- TODO: benchmark being strict
-import           Data.List           (foldl')
-import           Data.Maybe          (catMaybes)
-import           Data.Monoid         ((<>))
-import           Data.Ord            (comparing, Down(..))
+import           Control.Arrow         (second)
+import           Control.Applicative
+import           Control.Monad
+import           Data.Attoparsec.ByteString.Lazy
+import           Data.Attoparsec.ByteString.Char8 hiding (eitherResult, parse, skipWhile, takeWhile1)
+import qualified Data.ByteString.Lazy as B
+import qualified Data.IntMap.Strict as I
+import           Data.List (foldl')
+import           Data.Monoid           ((<>))
+import           Data.Ord              (comparing, Down(..))
 import qualified Data.Vector as V
+import qualified Data.Vector.Unboxed as U
+import qualified Data.Vector.Unboxed.Mutable as UM
+import qualified Data.Vector.Generic.Base as B
+import qualified Data.Vector.Generic.Mutable as M
+import           Text.Printf
 
-{- TODO:
-talk about
-    lazy vs strict in Solution
--}
+main = do
+    (cap, n, vws) <- readProblem "test_problem_1.data"
+    let Solution s (V v) (W w) = knapsackNative (U.fromListN n vws) cap
 
-type Selection = I.IntMap Int
-newtype Value = V {unV :: Int} deriving (Eq, Ord, Num, Real, Enum, Integral, Show)
-newtype Weight = W {unW :: Int} deriving (Eq, Ord, Num, Real, Enum, Integral, Show)
+    printf "\nThe Haskell solution is has a total weight of %i, a total value of %i and a selection of:\n" w v
+    forM_ (I.toList (countMap s)) $ uncurry (printf "\tindex: %i, quantity: %i\n")
+
+    where
+    countMap :: [Int] -> I.IntMap Int
+    countMap = foldl' (\m i -> I.insertWith (+) i 1 m) I.empty
+
+-- TODO: make this insert vws into a mutable vector? Can you fuse parsing and vectoring?
+readProblem :: String -> IO (Weight, Int, [(Value,Weight)])
+readProblem filename = do
+    file <- B.readFile filename
+    either error return $ eitherResult $ flip parse file $ do
+        cap <- decimal
+        space
+        n <- decimal
+        endOfLine
+        vws <- many $ (makeVW <$> (decimal <* space) <*> decimal <* endOfLine)
+        return (W cap, n, vws)
+    where
+    makeVW v w = (V v, W w)
+
+
+type Selection = [Int]
+
+newtype Value = V {unV :: Int} deriving (Eq, Ord, Num, Real, Enum, Integral, Show, U.Unbox)
+newtype Weight = W {unW :: Int} deriving (Eq, Ord, Num, Real, Enum, Integral, Show, U.Unbox)
+
+deriving instance (B.Vector U.Vector Value)
+deriving instance (M.MVector UM.MVector Value)
+deriving instance (B.Vector U.Vector Weight)
+deriving instance (M.MVector UM.MVector Weight)
+
 
 data Solution = Solution {
     selection :: Selection,
@@ -25,38 +62,36 @@ data Solution = Solution {
     totalWeight :: {-# UNPACK #-} !Weight}
     deriving (Eq, Show)
 
-emptySoln = Solution I.empty 0 0
-
 -- the best solution has the highest value or, in the case of a draw, the lowest weight
 instance Ord Solution where
     compare = comparing totalValue <> comparing (Down . totalWeight)
 
--- | Given a list of (Value, Weight) pairs (where the weights are positive), maximises the total value
---   while keeping the total weight under the capacity.
-solve :: [(Int, Int)] -> Int -> (I.IntMap Int, Int, Int)
-solve vws cap = (s, v, w)
-    where Solution s (V v) (W w) = knapsackNative (V.fromList $ map (V *** W) vws) (W cap)
+emptySoln :: Solution
+emptySoln = Solution [] 0 0
 
-knapsackNative :: V.Vector (Value, Weight) -> Weight -> Solution
+knapsackNative :: U.Vector (Value, Weight) -> Weight -> Solution
 knapsackNative vws cap = unscale $ knapsackScaled vws' (scale cap)
     where
-    vws' = if gcdW /= 1 then (V.map (second scale) vws) else vws
-    gcdW = V.foldl' gcd cap $ V.map snd vws -- is this fused?
+    vws' = if gcdW /= 1 then (U.map (second scale) vws) else vws
+    gcdW = U.foldl' gcd cap $ U.map snd vws
     scale x = div x gcdW
     unscale (Solution s v w) = Solution s v (w*gcdW)
 
-knapsackScaled :: V.Vector (Value, Weight) -> Weight -> Solution
+knapsackScaled :: U.Vector (Value, Weight) -> Weight -> Solution
 knapsackScaled vws (W cap) = solns V.! cap
     where
     -- a vector of the best solution at each (scaled) weight
     solns :: V.Vector Solution
-    solns = V.generate (cap+1) genI
+    solns = V.generate (cap+1) $ \case
+        0  -> emptySoln
+              -- TODO: if vws is sorted by weight then we can go only up to
+              --       the max allowed weight rather than go through the whole
+              --       thing each time
+        !i -> V.foldl' maxMaybe emptySoln $ V.generate (U.length vws) $ \j -> eachPair j (vws U.! j)
+                where
+                eachPair :: Int -> (Value, Weight) -> Maybe Solution
+                eachPair !j (v, w) | unW w <= i = case solns V.! (i - unW w) of
+                    Solution s' v' w' -> Just $ Solution (j:s') (v' + v) (w' + w)
+                eachPair _ _ = Nothing
 
-    genI :: Int -> Solution
-    genI 0 = emptySoln
-    genI !i = foldl' max emptySoln $ catMaybes $ V.toList $ V.imap eachPair vws -- possibly remove the intermediate list here?
-        where
-        eachPair :: Int -> (Value, Weight) -> Maybe Solution
-        eachPair !j (v, w) | unW w <= i = case solns V.! (i - unW w) of
-            Solution s' !v' !w' -> Just $ Solution (I.insertWith (+) j 1 s') (v' + v) (w' + w)
-        eachPair _ _ = Nothing
+                maxMaybe s sM = maybe id max sM s
