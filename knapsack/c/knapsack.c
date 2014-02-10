@@ -15,7 +15,7 @@ int main () {
 	char* FILE_NAME = "test_problem_1.data";
 
 	read_file(FILE_NAME, &cap, &n, &vws);
-	qsort (vws, n, sizeof(vw_t), cmp_vws);
+	qsort (vws, n, sizeof(vw_t), cmp_weight);
 
 	bestAns = knapsack (cap, n, vws);
 	free (vws);
@@ -74,7 +74,6 @@ collated_solution knapsack(int cap, size_t n,
 	solutions[0] = (solution){0,0,-1,NULL};
 
 	vw_t best_vw;
-	int best_j;
 	int best_position;
 
 	for (i = 1; i <= cap; i++) {
@@ -89,7 +88,9 @@ collated_solution knapsack(int cap, size_t n,
 			int weight = vws[j].weight;
 
 			// if the weight doesn't fit then we can't do anything
-			if (weight > i) {continue;}
+			// since all the weights after this are bigger than the
+			// current weight we can't use those either
+			if (weight > i) {break;}
 
 			int prospective_position = i - weight;
 			vw_t prospective_vw;
@@ -107,11 +108,16 @@ collated_solution knapsack(int cap, size_t n,
 
 		// update solutions[i]
 		solutions[i].total_vw = best_vw;
-
-		solutions[i].selection_list = solutions[best_position].selection_list;
-		index *new_index = malloc (sizeof(index));
-		*new_index = (index){best_vw.original_ix, NULL};
-		LL_PREPEND(solutions[i].selection_list, new_index);
+		if (best_position != -1) {
+			// found a solution
+			solutions[i].selection_list = solutions[best_position].selection_list;
+			index *new_index = malloc (sizeof(index));
+			*new_index = (index){best_vw.original_ix, NULL};
+			LL_PREPEND(solutions[i].selection_list, new_index);
+		} else {
+			// no solutions for this i
+			solutions[i].selection_list = NULL;
+		}
 	}
 
 	// prepare the solution to be returned
@@ -175,6 +181,13 @@ int cmp_vws (const void *arg1, const void *arg2) {
 		return -1;
 	}
 }
+
+int cmp_weight (const void *arg1, const void *arg2) {
+	const vw_t *x = arg1;
+	const vw_t *y = arg2;
+	return x->weight - y->weight;
+}
+
 
 selection** empty_selection() {
 	selection** ss = malloc(sizeof(selection*));

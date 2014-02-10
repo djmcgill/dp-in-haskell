@@ -32,6 +32,7 @@ collated_solution knapsack          (int, size_t, vw_t[]);
 void              read_file         (const char*, int*, int*, vw_t**);
 int               scale_by_gcd      (int*, size_t, vw_t[]);
 int               cmp_vws           (const void*, const void*);
+int               cmp_weight        (const void*, const void*);
 
 void              increment_position(selection**, int);
 selection**       empty_selection   ();
