@@ -2,51 +2,45 @@
 #include<assert.h>
 
 #include "uthash-master/src/uthash.h"
+#include "uthash-master/src/utlist.h"
 #include "gcd.c"
 #include "knapsack.h"
 
-/*
-gcd = 1
-The solution is has a total weight of 7036, a total value of 68202 and a selection of:
-        index: 5252, quantity: 6
-        index: 4192, quantity: 64
-
-
-*/
+#include <stdlib.h>
 
 int main () {
 	int cap = 0, n = 0;
-	int *values = NULL, *weights = NULL;
-	solution bestAns;
+	vw_t *vws = NULL;
+	collated_solution bestAns;
 	char* FILE_NAME = "test_problem_1.data";
 
-	read_file(FILE_NAME, &cap, &n, &values, &weights);
+	read_file(FILE_NAME, &cap, &n, &vws);
+	qsort (vws, n, sizeof(vw_t), cmp_vws);
 
-	bestAns = knapsack (cap, n, values, weights);
-	free (weights);
-    free (values);
+	bestAns = knapsack (cap, n, vws);
+	free (vws);
+
 	// print answers
 	printf ("\nThe C solution is has a total weight of %i, a total value of %i and a selection of:\n",
-		bestAns.total_weight, bestAns.total_value);
+		bestAns.total_vw.weight, bestAns.total_vw.value);
 
 	selection *current_selection, *tmp;
-	HASH_ITER(hh, *(bestAns.sol_selection), current_selection, tmp) {
+	HASH_ITER(hh, *(bestAns.selection_hashmap), current_selection, tmp) {
 		printf ("\tindex: %i, quantity: %i\n", current_selection->position, current_selection->quantity);
 	}
-	// free sol_selection
-	HASH_ITER(hh, *(bestAns.sol_selection), current_selection, tmp) {
-		HASH_DEL(*(bestAns.sol_selection), current_selection);
+	// free bestAns.selection_hashmap
+	HASH_ITER(hh, *(bestAns.selection_hashmap), current_selection, tmp) {
+		HASH_DEL(*(bestAns.selection_hashmap), current_selection);
 		free (current_selection);
 	}
-	free (bestAns.sol_selection);
+	free (bestAns.selection_hashmap);
 	return 0;
 }
 
 void read_file (const char* const file_name,
-	            int* pCap,
-	            int* pN,
-	            int** restrict pValues,
-	            int** restrict pWeights) {
+	            int* restrict pCap,
+	            int* restrict pN,
+	            vw_t** restrict pVWs) {
 	FILE *pFile;
 	int i = 0;
 	pFile = fopen ("test_problem_1.data","r");
@@ -55,113 +49,131 @@ void read_file (const char* const file_name,
 
 	int n = *pN;
 	assert (n >= 0);
-	*pValues = malloc (n * sizeof(int));
-	*pWeights = malloc (n * sizeof(int));
+	*pVWs = malloc (n * sizeof(vw_t));
 	for (i = 0; i < n; i++) {
-		fscanf (pFile, "%i %i\n", *pValues + i, *pWeights + i);
-		assert ((*pValues)[i] >= 0 && (*pWeights)[i] > 0);
+		vw_t temp_vw;
+		// TODO: insert directly into pVW
+		fscanf (pFile, "%i %i\n", &(temp_vw.value), &(temp_vw.weight));
+		temp_vw.original_ix = i;
+		assert (temp_vw.value >= 0 && temp_vw.weight > 0);
+		(*pVWs)[i] = temp_vw;
 	}
 	fclose(pFile);
 }
 
-solution knapsack(int cap, size_t n,
-                  int values[restrict static n],
-                  int weights[restrict static n]) {
-	// assuming that len(values) == len (weights) == n
+collated_solution knapsack(int cap, size_t n,
+                  vw_t vws[restrict static n]) {
+	// assuming that len(vws) == n
 	int i = 0;
 	int j = 0;
 
-	int gcdWeights = scale_by_gcd(&cap, n, weights);
+	int gcd_w = scale_by_gcd(&cap, n, vws);
 
 	// make an array of size (cap+1) where the ith element is the best solution for a weight of i
 	solution* solutions = malloc((cap+1)*sizeof(solution));
-	solutions[0] = (solution){0,0,empty_selection()};
+	solutions[0] = (solution){0,0,-1,NULL};
 
-	int best_value;
-	int best_weight;
+	vw_t best_vw;
 	int best_j;
 	int best_position;
 
 	for (i = 1; i <= cap; i++) {
-		best_value = 0;
-		best_weight = 0;
-		best_j = -1;
+		best_vw = (vw_t){0,0,-1};
 		best_position = -1;
 
 		// for each value/weight, try to add it to best_selection
+		// TODO: we don't need to actually go down the whole array each time
+		// since it's sorted
 		for (j = 0; j < n; j++) {
-			int value = values[j];
-			int weight = weights[j];
+			int value = vws[j].value;
+			int weight = vws[j].weight;
 
 			// if the weight doesn't fit then we can't do anything
 			if (weight > i) {continue;}
 
 			int prospective_position = i - weight;
-			int prospective_value = value + solutions[prospective_position].total_value;
-			int prospective_weight = weight + solutions[prospective_position].total_weight;
-			assert (prospective_weight <= i);
+			vw_t prospective_vw;
+			prospective_vw.value = value + solutions[prospective_position].total_vw.value;
+			prospective_vw.weight = weight + solutions[prospective_position].total_vw.weight;
+			prospective_vw.original_ix = vws[j].original_ix;
+			assert (prospective_vw.weight <= i);
 
-			// if we've found a new maximum value (i.e. higher value or same value + lower weight)
-			if ((prospective_value > best_value) ||
-				(prospective_value == best_weight && prospective_weight < best_weight)) {
-
-				best_value = prospective_value;
-				best_weight = prospective_weight;
-				best_j = j;
+			// update the best value if needed
+			if (cmp_vws (&prospective_vw, &best_vw) >= 1) {
+				best_vw = prospective_vw;
 				best_position = prospective_position;
 			}
 		}
 
 		// update solutions[i]
-		solutions[i].total_value = best_value;
-		solutions[i].total_weight = best_weight;
+		solutions[i].total_vw = best_vw;
 
-		// copy over the selection hashmap (including each selection)
-		solutions[i].sol_selection = empty_selection();
-
-		if (best_j != -1 && best_position != -1) {
-			// if we have a new position, copy over the old selection and increment the position
-			selection* s;
-			for (s = *(solutions[best_position].sol_selection); s != NULL; s=s->hh.next) {
-				selection* new_s = malloc(sizeof(selection));
-				*new_s = *s;
-				HASH_ADD_INT (*(solutions[i].sol_selection), position, new_s);
-			}
-		increment_position(solutions[i].sol_selection, best_j);
-		}
+		solutions[i].selection_list = solutions[best_position].selection_list;
+		index *new_index = malloc (sizeof(index));
+		*new_index = (index){best_vw.original_ix, NULL};
+		LL_PREPEND(solutions[i].selection_list, new_index);
 	}
 
-	solution bestAns = solutions[cap];
-	bestAns.total_weight *= gcdWeights;
+	// prepare the solution to be returned
+	collated_solution bestAns;
+	bestAns.total_vw = solutions[cap].total_vw;
+	bestAns.total_vw.weight *= gcd_w;
 
-	// free each of the solutions (except solutions[cap] since its sol_selection gets reused in bestAns)
-	for (i = 0; i < cap; i++) {
-		cleanup_selection(solutions[i].sol_selection);
+	bestAns.selection_hashmap = empty_selection();
+	index *tmp_index;
+	LL_FOREACH (solutions[cap].selection_list, tmp_index) {
+		increment_position (bestAns.selection_hashmap, tmp_index->payload);
 	}
+
+	// free each of the solutions [0,cap]
+	for (i = 0; i <= cap; i++) {
+		free (solutions[i].selection_list);
+	}
+
 	free (solutions);
 	return bestAns;
 }
 
 int scale_by_gcd (int* capP, size_t n,
-                  int weights[restrict static n]) {
-	int i = 0, gcdWeights;
+                  vw_t vws[restrict static n]) {
+	int i = 0, gcd_w;
 
-	// find the gcd of all of the weights (foldl' gcd cap weights)
-	gcdWeights = *capP;
+	// find the gcd of all of the weights (foldl' gcd cap (map snd vws))
+	gcd_w = *capP;
 	for (i = 0; i < n; i++) {
-		// gcdWeights gcd= weights[i]; sadly doesn't work :(
-		gcdWeights = gcd (gcdWeights, weights[i]);
+		// gcd_w gcd= weights[i]; sadly doesn't work :(
+		gcd_w = gcd (gcd_w, vws[i].weight);
 	}
 
-	if (gcdWeights != 1) {
+	if (gcd_w != 1) {
 		// scale the weights by their gcd
-		*capP /= gcdWeights;
-
+		*capP /= gcd_w;
 		for (i = 0; i < n; i++) {
-			weights[i] /= gcdWeights;
+			vws[i].weight /= gcd_w;
 		}
 	}
-	return gcdWeights;
+	return gcd_w;
+}
+
+// if x > y then 1; if x == y then 0; if x < y then -1
+// where the highest solution is the highest value (or in the case of a tie the lowest weight)
+int cmp_vws (const void *arg1, const void *arg2) {
+	const vw_t *x = arg1;
+	const vw_t *y = arg2;
+
+	if (x->value > y->value) {
+		return 1;
+	} else if (x->value == y->value) {
+		if (x->weight < y->weight) {
+			return 1;
+		} else if (x->weight == y->weight) {
+			return 0;
+		} else {
+			return -1;
+		}
+	} else {
+		return -1;
+	}
 }
 
 selection** empty_selection() {
