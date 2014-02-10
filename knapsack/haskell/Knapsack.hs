@@ -1,37 +1,45 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, BangPatterns, LambdaCase, StandaloneDeriving,
-             MultiParamTypeClasses #-}
-
+{-# LANGUAGE BangPatterns
+           , GeneralizedNewtypeDeriving
+           , MultiParamTypeClasses
+           , StandaloneDeriving
+           #-}
 
 import           Control.Arrow                    (second)
 import           Control.Applicative
 import           Control.Monad
-import           Data.Attoparsec.ByteString.Lazy
-import           Data.Attoparsec.ByteString.Char8 hiding (eitherResult, parse, skipWhile, takeWhile1)
-import qualified Data.ByteString.Lazy             as B
+import           Control.Monad.ST
 import qualified Data.IntMap.Strict               as I
 import           Data.List
 import           Data.Monoid
 import           Data.Ord
+import           Text.Printf
+
+-- Parsing imports
+import           Data.Attoparsec.ByteString.Lazy
+import           Data.Attoparsec.ByteString.Char8 hiding (eitherResult, parse, skipWhile, takeWhile1)
+import qualified Data.ByteString.Lazy             as B
+
+-- Vector imports
 import qualified Data.Vector                      as V
+import qualified Data.Vector.Algorithms.Heap      as H
 import qualified Data.Vector.Unboxed              as U
 import qualified Data.Vector.Unboxed.Mutable      as UM
-import qualified Data.Vector.Generic.Base         as B
-import qualified Data.Vector.Generic.Mutable      as M
-import           Text.Printf
+import qualified Data.Vector.Generic              as G
+import qualified Data.Vector.Generic.Mutable      as GM
 
 main = do
     (cap, n, vws) <- readProblem "test_problem_1.data"
-    let Solution s (V v) (W w) = knapsackNative (U.fromListN n vws) cap
+    when (U.null vws) $ error "no value/weights found"
+    printSolution $ knapsackNative (U.indexed vws) cap
 
+printSolution :: Solution -> IO ()
+printSolution (Solution s (V v) (W w)) = do
     printf "\nThe Haskell solution is has a total weight of %i, a total value of %i and a selection of:\n" w v
-    forM_ (I.toList (countMap s)) (uncurry (printf "\tindex: %i, quantity: %i\n"))
+    forM_ (I.toList (countIxs s)) (uncurry (printf "\tindex: %i, quantity: %i\n"))
+    where countIxs = foldl' (\m i -> I.insertWith (+) i (1 :: Int) m) I.empty
 
-    where
-    countMap :: [Int] -> I.IntMap Int
-    countMap = foldl' (\m i -> I.insertWith (+) i 1 m) I.empty
-
--- TODO: make this insert vws into a mutable vector? Can you fuse parsing and vectoring?
-readProblem :: String -> IO (Weight, Int, [(Value,Weight)])
+-- Parse the problem from a file
+readProblem :: String -> IO (Weight, Int, U.Vector (Value, Weight))
 readProblem filename = do
     file <- B.readFile filename
     either error return $ eitherResult $ flip parse file $ do
@@ -39,61 +47,67 @@ readProblem filename = do
         space
         n <- decimal
         endOfLine
-        vws <- many $ (makeVW <$> decimal <* space <*> decimal <* endOfLine)
+        vws <- U.replicateM n (makeVW <$> decimal <* space <*> decimal <* endOfLine)
         return (W cap, n, vws)
-    where
-    makeVW v w = (V v, W w)
+    where makeVW v w = (V v, W w)
 
 -- set up the newtypes including unboxed vectors of them
-newtype Value = V {unV :: Int} deriving (Eq, Ord, Num, Real, Enum, Integral, Show, U.Unbox)
+newtype Value  = V {unV :: Int} deriving (Eq, Ord, Num, Real, Enum, Integral, Show, U.Unbox)
 newtype Weight = W {unW :: Int} deriving (Eq, Ord, Num, Real, Enum, Integral, Show, U.Unbox)
-deriving instance (B.Vector U.Vector Value)
-deriving instance (M.MVector UM.MVector Value)
-deriving instance (B.Vector U.Vector Weight)
-deriving instance (M.MVector UM.MVector Weight)
+deriving instance (G.Vector   U.Vector   Value)
+deriving instance (GM.MVector UM.MVector Value)
+deriving instance (G.Vector   U.Vector   Weight)
+deriving instance (GM.MVector UM.MVector Weight)
 
--- TODO: test [Int] vs IntMap Int
-type Selection = [Int]
-emptySelection = []
-addIndex :: Int -> Selection -> Selection
-addIndex = (:)
+getW :: (Int, (Value, Weight)) -> Weight
+getW = snd . snd
 
-data Solution = Solution {
-    selection :: Selection,
-    totalValue :: {-# UNPACK #-} !Value,
-    totalWeight :: {-# UNPACK #-} !Weight}
-    deriving (Eq, Show)
+data Solution = Solution
+    { selection   :: [Int]                  -- a list of chosen indices
+    , totalValue  :: {-# UNPACK #-} !Value  -- the total value of the selection
+    , totalWeight :: {-# UNPACK #-} !Weight -- the total weight of the selection
+    } deriving (Eq, Show)
 
 -- the best solution has the highest value or, in the case of a draw, the lowest weight
 instance Ord Solution where
     compare = comparing totalValue <> comparing (Down . totalWeight)
 
 emptySoln :: Solution
-emptySoln = Solution emptySelection 0 0
+emptySoln = Solution [] 0 0
 
-knapsackNative :: U.Vector (Value, Weight) -> Weight -> Solution
-knapsackNative vws cap = unscale $ knapsackScaled (scaleV vws) (scale cap)
+knapsackNative :: U.Vector (Int, (Value, Weight)) -> Weight -> Solution
+knapsackNative vws cap = unscale $ knapsackScaled (scaleV (sortWeights vws)) (scale cap)
     where
-    scaleV  = if gcdW /= 1 then U.map (second scale) else id
-    gcdW    = U.foldl' gcd cap $ U.map snd vws
+    gcdW    = U.foldl' gcd cap $ U.map (snd.snd) vws
     scale x = div x gcdW
+    scaleV  = if gcdW /= 1 then U.map (second (second scale)) else id
     unscale (Solution s v w) = Solution s v (w*gcdW)
 
-knapsackScaled :: U.Vector (Value, Weight) -> Weight -> Solution
-knapsackScaled vws (W cap) = solns V.! cap
+    sortWeights = U.modify (H.sortBy (comparing getW))
+
+knapsackScaled :: U.Vector (Int, (Value, Weight)) -> Weight -> Solution
+knapsackScaled vws (W cap) = V.unsafeIndex solns cap
     where
     -- a vector of the best solution at each (scaled) weight
     solns :: V.Vector Solution
-    solns = V.generate (cap+1) $ \case
-        0  -> emptySoln
-              -- TODO: if vws is sorted by weight then we can go only up to
-              --       the max allowed weight rather than go through the whole
-              --       thing each time
-        !i -> V.foldl' maxMaybe emptySoln $ V.generate (U.length vws) $ \j -> eachPair j (vws U.! j)
+    solns = V.unfoldrN (cap+1) getBest (0,0)
+        where
+        -- i is the current index, less is the maximal index into vws such that forall ix. 0 <= ix < less', getW (vws[ix]) <= W i
+        getBest (!i, !less) = Just (maxSolution, (i+1, less'))
+            where
+            maxSolution = V.foldl' max emptySoln $ V.generate (U.length validWeights) (eachPair . U.unsafeIndex validWeights)
+            -- validWeights = U.takeWhile (\x -> getW x <= W i) vws
+            -- but takes advantage of the fact that the slice is strictly non-decreasing to memoise
+            -- TODO: benchmark this vs U.takeWhile
+            validWeights = U.unsafeTake less' vws
+            less' = updateLess less
                 where
-                eachPair :: Int -> (Value, Weight) -> Maybe Solution
-                eachPair !j (v, w) | unW w <= i = case solns V.! (i - unW w) of
-                    Solution s' v' w' -> Just $ Solution (addIndex j s') (v' + v) (w' + w)
-                eachPair _ _ = Nothing
+                maxIx = U.length vws
+                updateLess j = if j == maxIx || getW (U.unsafeIndex vws j) > W i
+                                then j else updateLess (j+1)
 
-                maxMaybe s sM = maybe id max sM s
+            -- This is what the solution would look like with the vw pair in.
+            -- Please don't call it in a case where i < w or bad things will happen.
+            eachPair :: (Int, (Value, Weight)) -> Solution
+            eachPair (ix, (v, w)) = case solns `V.unsafeIndex` (i - unW w) of
+                Solution s' v' w' -> Solution (ix : s') (v' + v) (w' + w)
