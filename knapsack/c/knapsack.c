@@ -1,4 +1,6 @@
 #include<stdio.h>
+
+#define NDEBUG
 #include<assert.h>
 
 #include "uthash-master/src/uthash.h"
@@ -63,7 +65,6 @@ void read_file (const char* const file_name,
 
 collated_solution knapsack(int cap, size_t n,
                   vw_t vws[restrict static n]) {
-	// assuming that len(vws) == n
 	int i = 0;
 	int j = 0;
 
@@ -80,9 +81,7 @@ collated_solution knapsack(int cap, size_t n,
 		best_vw = (vw_t){0,0,-1};
 		best_position = -1;
 
-		// for each value/weight, try to add it to best_selection
-		// TODO: we don't need to actually go down the whole array each time
-		// since it's sorted
+		// for each value/weight, try to add it to best_vw
 		for (j = 0; j < n; j++) {
 			int value = vws[j].value;
 			int weight = vws[j].weight;
@@ -92,6 +91,7 @@ collated_solution knapsack(int cap, size_t n,
 			// current weight we can't use those either
 			if (weight > i) {break;}
 
+			// let's see what the new solution would look like
 			int prospective_position = i - weight;
 			vw_t prospective_vw;
 			prospective_vw.value = value + solutions[prospective_position].total_vw.value;
@@ -161,7 +161,6 @@ int scale_by_gcd (int* capP, size_t n,
 	return gcd_w;
 }
 
-// if x > y then 1; if x == y then 0; if x < y then -1
 // where the highest solution is the highest value (or in the case of a tie the lowest weight)
 int cmp_vws (const void *arg1, const void *arg2) {
 	const vw_t *x = arg1;

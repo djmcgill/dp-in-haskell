@@ -7,7 +7,7 @@
 import           Control.Arrow                    (second)
 import           Control.Applicative
 import           Control.Monad
-import           Control.Monad.ST
+import           Control.Monad.State.Strict
 import qualified Data.IntMap.Strict               as I
 import           Data.List
 import           Data.Monoid
@@ -36,7 +36,9 @@ printSolution :: Solution -> IO ()
 printSolution (Solution s (V v) (W w)) = do
     printf "\nThe Haskell solution is has a total weight of %i, a total value of %i and a selection of:\n" w v
     forM_ (I.toList (countIxs s)) (uncurry (printf "\tindex: %i, quantity: %i\n"))
-    where countIxs = foldl' (\m i -> I.insertWith (+) i (1 :: Int) m) I.empty
+
+countIxs :: [Int] -> I.IntMap Int
+countIxs = foldl' (\m i -> I.insertWith (+) i 1 m) I.empty
 
 -- Parse the problem from a file
 readProblem :: String -> IO (Weight, Int, U.Vector (Value, Weight))
@@ -47,9 +49,13 @@ readProblem filename = do
         space
         n <- decimal
         endOfLine
-        vws <- U.replicateM n (makeVW <$> decimal <* space <*> decimal <* endOfLine)
+        vws <- U.replicateM n $ do
+            v <- decimal
+            space
+            w <- decimal
+            endOfLine
+            return (V v, W w)
         return (W cap, n, vws)
-    where makeVW v w = (V v, W w)
 
 -- set up the newtypes including unboxed vectors of them
 newtype Value  = V {unV :: Int} deriving (Eq, Ord, Num, Real, Enum, Integral, Show, U.Unbox)
@@ -75,6 +81,7 @@ instance Ord Solution where
 emptySoln :: Solution
 emptySoln = Solution [] 0 0
 
+-- sort out the params (scaling the weight and sorting the vws) before calling knapsackScaled
 knapsackNative :: U.Vector (Int, (Value, Weight)) -> Weight -> Solution
 knapsackNative vws cap = unscale $ knapsackScaled (scaleV (sortWeights vws)) (scale cap)
     where
@@ -83,31 +90,28 @@ knapsackNative vws cap = unscale $ knapsackScaled (scaleV (sortWeights vws)) (sc
     scaleV  = if gcdW /= 1 then U.map (second (second scale)) else id
     unscale (Solution s v w) = Solution s v (w*gcdW)
 
-    sortWeights = U.modify (H.sortBy (comparing getW))
+    sortWeights = U.modify $ H.sortBy (comparing getW)
 
+-- actually compute the solution
 knapsackScaled :: U.Vector (Int, (Value, Weight)) -> Weight -> Solution
 knapsackScaled vws (W cap) = V.unsafeIndex solns cap
     where
-    -- a vector of the best solution at each (scaled) weight
+    -- a vector of the (memoised) best solution at each (scaled) weight
     solns :: V.Vector Solution
-    solns = V.unfoldrN (cap+1) getBest (0,0)
-        where
-        -- i is the current index, less is the maximal index into vws such that forall ix. 0 <= ix < less', getW (vws[ix]) <= W i
-        getBest (!i, !less) = Just (maxSolution, (i+1, less'))
-            where
-            maxSolution = V.foldl' max emptySoln $ V.generate (U.length validWeights) (eachPair . U.unsafeIndex validWeights)
-            -- validWeights = U.takeWhile (\x -> getW x <= W i) vws
-            -- but takes advantage of the fact that the slice is strictly non-decreasing to memoise
-            -- TODO: benchmark this vs U.takeWhile
-            validWeights = U.unsafeTake less' vws
-            less' = updateLess less
-                where
-                maxIx = U.length vws
-                updateLess j = if j == maxIx || getW (U.unsafeIndex vws j) > W i
-                                then j else updateLess (j+1)
+    solns = flip evalState 0 $ V.generateM (cap+1) $ \(!i) -> do -- TODO: benchmark this strictness
+        -- validWeights = U.takeWhile (\x -> getW x <= W i) vws
+        -- but takes advantage of the fact that the slice is non-decreasing to memoise
+        validWeights <- state $ \oldIx ->
+            let newIx = (oldIx +) . U.length
+                      . U.takeWhile (\x -> getW x <= W i)
+                      $ U.unsafeDrop oldIx vws
+            in (U.unsafeTake newIx vws, newIx)
 
-            -- This is what the solution would look like with the vw pair in.
-            -- Please don't call it in a case where i < w or bad things will happen.
-            eachPair :: (Int, (Value, Weight)) -> Solution
+        -- Add the vw pair to the best solution of weight i-w and see that the new solution
+        -- would look like. Please don't call it in a case where i < w or bad things will happen.
+        let eachPair :: (Int, (Value, Weight)) -> Solution
             eachPair (ix, (v, w)) = case solns `V.unsafeIndex` (i - unW w) of
                 Solution s' v' w' -> Solution (ix : s') (v' + v) (w' + w)
+        return . V.foldl' max emptySoln
+               . V.generate (U.length validWeights)
+               $ eachPair . U.unsafeIndex validWeights
