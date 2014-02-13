@@ -85,11 +85,10 @@ emptySoln = Solution [] 0 0
 knapsackNative :: U.Vector (Int, (Value, Weight)) -> Weight -> Solution
 knapsackNative vws cap = unscale $ knapsackScaled (scaleV (sortWeights vws)) (scale cap)
     where
-    gcdW    = U.foldl' gcd cap $ U.map (snd.snd) vws
+    gcdW    = U.foldl' gcd cap $ U.map getW vws
     scale x = div x gcdW
     scaleV  = if gcdW /= 1 then U.map (second (second scale)) else id
     unscale (Solution s v w) = Solution s v (w*gcdW)
-
     sortWeights = U.modify $ H.sortBy (comparing getW)
 
 -- actually compute the solution
@@ -98,7 +97,7 @@ knapsackScaled vws (W cap) = V.unsafeIndex solns cap
     where
     -- a vector of the (memoised) best solution at each (scaled) weight
     solns :: V.Vector Solution
-    solns = flip evalState 0 $ V.generateM (cap+1) $ \(!i) -> do -- TODO: benchmark this strictness
+    solns = flip evalState 0 $ V.generateM (cap+1) $ \(!i) -> do
         -- validWeights = U.takeWhile (\x -> getW x <= W i) vws
         -- but takes advantage of the fact that the slice is non-decreasing to memoise
         validWeights <- state $ \oldIx ->
