@@ -1,0 +1,17 @@
+benchmarking knapsack-catMaybes
+Warning: using system clock for seed instead (quality will be lower)
+mean: 3.893003 s, lb 3.876069 s, ub 3.927706 s, ci 0.950
+std dev: 39.60356 ms, lb 19.60450 ms, ub 62.45652 ms, ci 0.950
+found 1 outliers among 10 samples (10.0%)
+  1 (10.0%) high severe
+variance introduced by outliers: 9.000%
+variance is slightly inflated by outliers
+
+benchmarking knapsack-fusion
+collecting 10 samples, 1 iterations each, in estimated 13.04332 s
+mean: 1.302679 s, lb 1.299700 s, ub 1.306664 s, ci 0.950
+std dev: 5.845694 ms, lb 3.552098 ms, ub 9.116452 ms, ci 0.950
+found 1 outliers among 10 samples (10.0%)
+  1 (10.0%) high mild
+variance introduced by outliers: 9.000%
+variance is slightly inflated by outliers

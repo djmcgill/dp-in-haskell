@@ -1,0 +1,27 @@
+benchmarking knapsack-unfoldr
+collecting 20 samples, 1 iterations each, in estimated 13.90930 s
+mean: 627.4105 ms, lb 618.8343 ms, ub 639.5583 ms, ci 0.950
+std dev: 23.82561 ms, lb 17.24819 ms, ub 30.69619 ms, ci 0.950
+found 2 outliers among 20 samples (10.0%)
+  2 (10.0%) high mild
+variance introduced by outliers: 9.458%
+variance is slightly inflated by outliers
+
+benchmarking knapsack-traverse
+collecting 20 samples, 1 iterations each, in estimated 12.10811 s
+mean: 607.4291 ms, lb 605.5755 ms, ub 610.7561 ms, ci 0.950
+std dev: 5.686825 ms, lb 3.265870 ms, ub 9.899192 ms, ci 0.950
+found 1 outliers among 20 samples (5.0%)
+  1 (5.0%) high severe
+variance introduced by outliers: 4.750%
+variance is slightly inflated by outliers
+
+benchmarking knapsack-generateM
+collecting 20 samples, 1 iterations each, in estimated 12.07087 s
+mean: 598.3033 ms, lb 596.1213 ms, ub 601.9899 ms, ci 0.950
+std dev: 6.500017 ms, lb 3.908341 ms, ub 10.65146 ms, ci 0.950
+found 2 outliers among 20 samples (10.0%)
+  1 (5.0%) high mild
+  1 (5.0%) high severe
+variance introduced by outliers: 4.750%
+variance is slightly inflated by outliers

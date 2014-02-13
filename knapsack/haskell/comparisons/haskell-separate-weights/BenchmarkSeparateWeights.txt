@@ -1,0 +1,13 @@
+benchmarking knapsack-combined
+collecting 10 samples, 1 iterations each, in estimated 6.081245 s
+mean: 606.0994 ms, lb 601.2862 ms, ub 611.1648 ms, ci 0.950
+std dev: 8.429826 ms, lb 6.274609 ms, ub 11.76039 ms, ci 0.950
+variance introduced by outliers: 9.000%
+variance is slightly inflated by outliers
+
+benchmarking knapsack-separate
+collecting 10 samples, 1 iterations each, in estimated 7.454972 s
+mean: 663.0288 ms, lb 652.9882 ms, ub 676.9373 ms, ci 0.950
+std dev: 20.17659 ms, lb 13.50366 ms, ub 24.42233 ms, ci 0.950
+variance introduced by outliers: 9.000%
+variance is slightly inflated by outliers

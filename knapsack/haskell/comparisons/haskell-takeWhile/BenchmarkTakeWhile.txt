@@ -1,0 +1,26 @@
+benchmarking knapsack-take
+collecting 10 samples, 1 iterations each, in estimated 6.228168 s
+mean: 624.6537 ms, lb 619.5469 ms, ub 634.8255 ms, ci 0.950
+std dev: 11.76980 ms, lb 6.086801 ms, ub 18.47202 ms, ci 0.950
+found 1 outliers among 10 samples (10.0%)
+  1 (10.0%) high mild
+variance introduced by outliers: 9.000%
+variance is slightly inflated by outliers
+
+benchmarking knapsack-takeWhile
+collecting 10 samples, 1 iterations each, in estimated 11.52771 s
+mean: 1.156653 s, lb 1.143787 s, ub 1.194052 s, ci 0.950
+std dev: 34.90308 ms, lb 8.814577 ms, ub 58.12755 ms, ci 0.950
+found 1 outliers among 10 samples (10.0%)
+  1 (10.0%) high severe
+variance introduced by outliers: 9.000%
+variance is slightly inflated by outliers
+
+benchmarking knapsack-takeDrop
+collecting 10 samples, 1 iterations each, in estimated 6.074066 s
+mean: 609.0811 ms, lb 606.8545 ms, ub 613.8100 ms, ci 0.950
+std dev: 5.332430 ms, lb 2.269495 ms, ub 8.765550 ms, ci 0.950
+found 1 outliers among 10 samples (10.0%)
+  1 (10.0%) high severe
+variance introduced by outliers: 9.000%
+variance is slightly inflated by outliers

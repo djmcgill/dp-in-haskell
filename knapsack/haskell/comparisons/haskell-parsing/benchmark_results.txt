@@ -1,0 +1,20 @@
+benchmarking Attoparsec.decimal
+mean: 9.452281 ms, lb 9.350567 ms, ub 9.557495 ms, ci 0.950
+std dev: 530.3521 us, lb 487.0523 us, ub 608.8886 us, ci 0.950
+variance introduced by outliers: 54.444%
+variance is severely inflated by outliers
+
+benchmarking Attoparsec.uint
+mean: 9.693492 ms, lb 9.592669 ms, ub 9.788213 ms, ci 0.950
+std dev: 500.2222 us, lb 444.2948 us, ub 576.8684 us, ci 0.950
+variance introduced by outliers: 49.474%
+variance is moderately inflated by outliers
+
+benchmarking Prelude.read
+collecting 100 samples, 1 iterations each, in estimated 9.296060 s
+mean: 93.63477 ms, lb 93.25659 ms, ub 94.09080 ms, ci 0.950
+std dev: 2.120057 ms, lb 1.804870 ms, ub 2.564599 ms, ci 0.950
+found 2 outliers among 100 samples (2.0%)
+  2 (2.0%) high mild
+variance introduced by outliers: 16.119%
+variance is moderately inflated by outliers

@@ -1,0 +1,22 @@
+benchmarking lazy
+collecting 10 samples, 1 iterations each, in estimated 40.42662 s
+mean: 3.893499 s, lb 3.877579 s, ub 3.925433 s, ci 0.950
+std dev: 36.15417 ms, lb 7.597385 ms, ub 54.60278 ms, ci 0.950
+found 2 outliers among 10 samples (20.0%)
+  2 (20.0%) high severe
+variance introduced by outliers: 9.000%
+variance is slightly inflated by outliers
+
+benchmarking strict
+collecting 10 samples, 1 iterations each, in estimated 39.03621 s
+mean: 3.886491 s, lb 3.868038 s, ub 3.912681 s, ci 0.950
+std dev: 36.99599 ms, lb 23.17287 ms, ub 56.18013 ms, ci 0.950
+variance introduced by outliers: 9.000%
+variance is slightly inflated by outliers
+
+benchmarking super-strict
+collecting 10 samples, 1 iterations each, in estimated 56.82945 s
+mean: 6.240957 s, lb 5.994244 s, ub 6.444562 s, ci 0.950
+std dev: 382.4324 ms, lb 281.6412 ms, ub 487.5551 ms, ci 0.950
+variance introduced by outliers: 18.336%
+variance is moderately inflated by outliers

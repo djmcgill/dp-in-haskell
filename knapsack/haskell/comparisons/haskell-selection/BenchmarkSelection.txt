@@ -1,0 +1,14 @@
+benchmarking knapsack-list
+mean: 858.2014 ms, lb 854.3106 ms, ub 863.5065 ms, ci 0.950
+std dev: 7.731510 ms, lb 5.492283 ms, ub 10.52232 ms, ci 0.950
+variance introduced by outliers: 9.000%
+variance is slightly inflated by outliers
+
+benchmarking knapsack-map
+mean: 920.5141 ms, lb 858.4319 ms, ub 1.068905 s, ci 0.950
+std dev: 152.3725 ms, lb 61.33289 ms, ub 241.6297 ms, ci 0.950
+found 2 outliers among 10 samples (20.0%)
+  1 (10.0%) high mild
+  1 (10.0%) high severe
+variance introduced by outliers: 57.947%
+variance is severely inflated by outliers
