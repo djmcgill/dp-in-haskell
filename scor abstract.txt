@@ -1,18 +1,5 @@
-MAX 250 WORDS
-KEYWORDS: MAX 5
+Over the last decade CPU speed has increased by many orders of magnitude yet the speed of the typical programmer has not. In some cases (e.g. when prototyping new heuristics or algorithms) it is far more important to quickly produce reliable and stable code than to eke out every possible optimisation from the program itself. There have been high profile cases recently in which a software bug has caused erroneous results to be published.
 
-Motivation:
-Why do we care about the problem and the results? If the problem isn't obviously "interesting" it might be better to put motivation first; but if your work is incremental progress on a problem that is widely recognized as important, then it is probably better to put the problem statement first to indicate which piece of the larger problem you are breaking off to work on. This section should include the importance of your work, the difficulty of the area, and the impact it might have if successful.
+This paper will investigate the use of Haskell to perform standard dynamic programming algorithms including bounded and unbounded knapsack, branch and cut, and column generation. It will compare to two of the languages most in use today (Java and C) in terms of speed, conciseness, modularity and ease of parallelisation, refactoring and debugging. The code structure will be reasonably similar across the languages except when taking advantage of specific language features (e.g. pointers, objects or laziness). The implementation is somewhat idiomatic and representative of an 'average' user - without nonportable (so called "ninja") micro-optimisations and in particular, standard libraries will be used for floating-point arithmetic and non-trivial data structures.
 
-Problem statement:
-What problem are you trying to solve? What is the scope of your work (a generalized approach, or for a specific situation)? Be careful not to use too much jargon. In some cases it is appropriate to put the problem statement before the motivation, but usually this only works if most readers already understand why the problem is important.
-
-Approach:
-How did you go about solving or making progress on the problem? Did you use simulation, analytic models, prototype construction, or analysis of field data for an actual product? What was the extent of your work (did you look at one application program or a hundred programs in twenty different programming languages?) What important variables did you control, ignore, or measure?
-
-Results:
-What's the answer? Specifically, most good computer architecture papers conclude that something is so many percent faster, cheaper, smaller, or otherwise better than something else. Put the result there, in numbers. Avoid vague, hand-waving results such as "very", "small", or "significant." If you must be vague, you are only given license to do so when you can talk about orders-of-magnitude improvement. There is a tension here in that you should not provide numbers that can be easily misinterpreted, but on the other hand you don't have room for all the caveats.
-
-Conclusions:
-What are the implications of your answer? Is it going to change the world (unlikely), be a significant "win", be a nice hack, or simply serve as a road sign indicating that this path is a waste of time (all of the previous results are useful). Are your results general, potentially generalizable, or specific to a particular case?
-
+The preliminary results (unbounded knapsack in C and Haskell) show that the C code is about 4 times faster while being more than twice as many lines of code and took far more than twice the time to implement. Haskell's type system prevented some errors (e.g. mixing up Values and Weights) while was no help against others (e.g. incorrect array indices).
