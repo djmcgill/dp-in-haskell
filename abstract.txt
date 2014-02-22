@@ -1,0 +1,29 @@
+In many cases it is far more important to quickly produce correct and robust
+code than to optimise code for performance. One such area is prototyping
+heuristics and algorithms for combinatorial optimisation. This paper
+investigates the use of Haskell to this end.
+
+We use Haskell to implement standard dynamic programming algorithms, including
+bounded and unbounded knapsack, branch and cut, and column generation. Then we
+compare with implementations in Java and C in terms of speed, conciseness,
+modularity, as well as ease of parallelisation, refactoring and debugging. To
+make the comparisons fair, we keep the structure of the code similar across
+languages, except when taking advantage of specific language features (e.g.,
+pointers, objects or laziness). The implementations are idiomatic and
+representative of an 'average' user, without non-portable micro-optimisations. 
+In particular, standard libraries are used throughout for floating-point
+arithmetic and non-trivial data structures.
+
+Effectively, we are using Haskell as a high-level, declarative,
+domain-specific language, and the paper also discusses the additional benefits
+of that approach, such as the potential to prove the correctness of
+algorithms, allowing domain experts (non programmers) to quickly try out new
+ideas, and how expressing algorithms at a very high level of abstraction can
+facilitate clever pruning, an aspect that is notoriously difficult to get
+right in when implementing in the usual way.
+
+Our preliminary results (unbounded knapsack in C and Haskell) show that while
+the C code is about four times faster, using Haskell for prototyping indeed
+offers significant advantages in terms of speed of development and eliminating
+certain classes of errors, without incurring a performance penalty that is
+unacceptable for a prototype.
