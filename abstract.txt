@@ -4,7 +4,7 @@ heuristics and algorithms for combinatorial optimisation. This paper
 investigates the use of Haskell to this end.
 
 We use Haskell to implement standard dynamic programming algorithms, including
-bounded and unbounded knapsack, branch and cut, and column generation. Then we
+bounded and unbounded knapsack, and column generation. Then we
 compare with implementations in Java and C in terms of speed, conciseness,
 modularity, as well as ease of parallelisation, refactoring, debugging and
 reasoning. To make the comparisons fair we keep the structure of the code
