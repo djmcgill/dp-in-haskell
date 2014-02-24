@@ -7,7 +7,7 @@ We use Haskell to implement standard dynamic programming algorithms, including
 bounded and unbounded knapsack, branch and cut, and column generation. Then we
 compare with implementations in Java and C in terms of speed, conciseness,
 modularity, as well as ease of parallelisation, refactoring, debugging and
-reasoning. To make the comparisons fair, we keep the structure of the code
+reasoning. To make the comparisons fair we keep the structure of the code
 similar across languages, except when taking advantage of specific language
 features (e.g., pointers, objects or laziness). The implementations are
 idiomatic and representative of an 'average' user, without non- portable
