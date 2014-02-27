@@ -101,19 +101,21 @@ grestore
 \maketitle
 
 \begin{abstract}
-Over the last decades, the speed of computers has increased by many orders of
-magnitude, but the speed of the typical programmer has not. In many cases it is far more important to quickly produce correct and robust
+Over the last decade the speed of computers has increased by many orders of
+magnitude but the speed of the typical programmer has not. In many cases it is far more important to quickly produce correct and robust
 code than to optimise code for performance, and as computers continue to
-become more powerful, while humans will essentially remain the same, this is
+become more powerful, while humans will essentially remain the same this is
 ultimately going to become the norm. We argue that prototyping new heuristics
 and algorithms for combinatorial optimisation is one area where speed of
 development of correct code is already more important than absolute
 performance.
 
-As an example, there was a high profile case recently \cite{Herndon13} in which a
-software bug has caused erroneous results to be published and to possibly influence European policy\footnote{\url{www.bbc.co.uk/news/magazine-22223190}}. Amongst other things, a cause of error was a range-indexing mistake in the spreadsheet which caused several countries to be excluded from the analysis.
+As an example, there was a high profile case recently\cite{Herndon13} in which a
+software bug has caused erroneous results to be published, and to possibly influence European policy\footnote{\url{www.bbc.co.uk/news/magazine-22223190}}. Amongst other things, a cause of error was a range-indexing mistake in the spreadsheet which caused several countries to be excluded from the analysis.
 
-Consider the simplified example of summing a collection of numbers: in a high level programming language like Java or Haskell one passes the name of a collection of numbers (whether an array, a list or otherwise) to the \emph{sum} function which will, behind the scenes and opaque to the programmer, index each element and add them together thus completely eliminating that class of errors. In most spreadsheet software however one has to manually select the cells (e.g. ``C3:C100'')\footnote{While named ranges do exist they still have to be manually specified which just pushes the problem elsewhere.} which is error-prone as well as being non-trivial to later expand to include additional data.
+Consider the simplified example of summing a collection of numbers: in a high level programming language like Haskell one passes the name of a collection of numbers (whether an array, a list or otherwise) to the \emph{sum} function which will, behind the scenes and opaque to the user, index each element and add them together thus completely eliminating that class of errors. In most spreadsheet software however one has to manually select the cells (e.g. ``C3:C100'')\footnote{While named ranges do exist they still have to be manually specified which just pushes the problem elsewhere.} which is error-prone as well as being non-trivial to later expand to include additional data.
+
+TODO: talk about reasoning about code
 
 We use Haskell to implement standard dynamic programming algorithms, including
 bounded and unbounded knapsack, and column generation. Then we
@@ -123,13 +125,16 @@ reasoning. To make the comparisons fair we keep the structure of the code
 similar across languages, except when taking advantage of specific language
 features (e.g., pointers, objects or laziness). The implementations are
 idiomatic and representative of an 'average' user, without non-portable micro-optimisations. In particular, standard libraries are used throughout for
-floating-point arithmetic and non-trivial data structures.
+data structures, mathematics and floating-point arithmetic with as little as possible implemented by hand.
 
 Our preliminary results (unbounded knapsack in C and Haskell) show that while
 the C code is about four times faster, using Haskell for prototyping indeed
 offers significant advantages in terms of speed of development and eliminating
 certain classes of errors, without incurring a performance penalty that is
-unacceptable for a prototype.
+unacceptable for a prototype. TODO: extend this, talk a little more about results
+
+TODO: Graph of results here? gcc -O2 vs ghc-O2 vs ghc -O2 -llvm vs clang -O2
+
 \keywords{Haskell \and C \and Java \and Functional Programming \and Dynamic Programming \and Language Comparison}
 % \PACS{PACS code1 \and PACS code2 \and more}
 % \subclass{MSC code1 \and MSC code2 \and more}
@@ -194,8 +199,8 @@ unacceptable for a prototype.
 
 % BibTeX users please use one of
 %\bibliographystyle{spbasic}      % basic style, author-year citations
-%\bibliographystyle{spmpsci}      % mathematics and physical sciences
-\bibliographystyle{spphys}       % APS-like style for physics
+\bibliographystyle{spmpsci}      % mathematics and physical sciences
+%\bibliographystyle{spphys}       % APS-like style for physics
 \bibliography{cites}   % name your BibTeX data base
 
 % Non-BibTeX users please use
