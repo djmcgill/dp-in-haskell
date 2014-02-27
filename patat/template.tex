@@ -47,10 +47,11 @@ grestore
 %
 \usepackage{graphicx}
 %
-% \usepackage{mathptmx}      % use Times fonts if available on your TeX system
+\usepackage{mathptmx}      % use Times fonts if available on your TeX system
 %
 % insert here the call for the packages your document requires
 %\usepackage{latexsym}
+\usepackage{epstopdf}
 % etc.
 %
 % please place your own definitions here and don't use \def but
@@ -61,29 +62,33 @@ grestore
 %
 \begin{document}
 
-\title{Insert your title here%\thanks{Grants or other notes
+\title{An Investigation into the Use of Haskell for Dynamic Programming%\thanks{Grants or other notes
 %about the article that should go on the front page should be
-%placed here. General acknowledgments should be placed at the end of the article.}
+%placed here. General acknowledgements should be placed at the end of the article.}
 }
-\subtitle{Do you have a subtitle?\\ If so, write it here}
+%\subtitle{Do you have a subtitle?\\ If so, write it here}
 
 %\titlerunning{Short form of title}        % if too long for running head
 
-\author{First Author         \and
-        Second Author %etc.
+\author{David McGillicuddy \and
+        Andrew J. Parkes \and
+	Henrik Nilsson
 }
 
 %\authorrunning{Short form of author list} % if too long for running head
 
-\institute{F. Author \at
-              first address \\
-              Tel.: +123-45-678910\\
-              Fax: +123-45-678910\\
-              \email{fauthor@example.com}           %  \\
+\institute{D. McGillicuddy \at
+              University Of Nottingham \\
+              \email{dxm@cs.nott.ac.uk}           %  \\
 %             \emph{Present address:} of F. Author  %  if needed
            \and
-           S. Author \at
-              second address
+           A. J. Parkes \at
+	University Of Nottingham \\
+	\email{ajp@cs.nott.ac.uk}
+	\and
+	H. Nilsson \at
+	University Of Nottingham \\
+	\email{nhn@cs.nott.ac.uk}
 }
 
 \date{Received: date / Accepted: date}
@@ -93,63 +98,82 @@ grestore
 \maketitle
 
 \begin{abstract}
-Insert your abstract here. Include keywords, PACS and mathematical
-subject classification numbers as needed.
-\keywords{First keyword \and Second keyword \and More}
+In many cases it is far more important to quickly produce correct and robust
+code than to optimise code for performance. One such area is prototyping
+heuristics and algorithms for combinatorial optimisation. This paper
+investigates the use of Haskell to this end.
+
+We use Haskell to implement standard dynamic programming algorithms, including
+bounded and unbounded knapsack, and column generation. Then we
+compare with implementations in Java and C in terms of speed, conciseness,
+modularity, as well as ease of parallelisation, refactoring, debugging and
+reasoning. To make the comparisons fair we keep the structure of the code
+similar across languages, except when taking advantage of specific language
+features (e.g., pointers, objects or laziness). The implementations are
+idiomatic and representative of an 'average' user, without non- portable
+micro-optimisations. In particular, standard libraries are used throughout for
+floating-point arithmetic and non-trivial data structures.
+
+Our preliminary results (unbounded knapsack in C and Haskell) show that while
+the C code is about four times faster, using Haskell for prototyping indeed
+offers significant advantages in terms of speed of development and eliminating
+certain classes of errors, without incurring a performance penalty that is
+unacceptable for a prototype.
+\keywords{Haskell \and Functional Programming \and Dynamic Programming \and Language Comparison \and C \and Java}
 % \PACS{PACS code1 \and PACS code2 \and more}
 % \subclass{MSC code1 \and MSC code2 \and more}
 \end{abstract}
 
-\section{Introduction}
-\label{intro}
-Your text comes here. Separate text sections with
-\section{Section title}
-\label{sec:1}
-Text with citations \cite{RefB} and \cite{RefJ}.
-\subsection{Subsection title}
-\label{sec:2}
-as required. Don't forget to give each section
-and subsection a unique label (see Sect.~\ref{sec:1}).
-\paragraph{Paragraph headings} Use paragraph headings as needed.
-\begin{equation}
-a^2+b^2=c^2
-\end{equation}
-
-% For one-column wide figures use
-\begin{figure}
-% Use the relevant command to insert your figure file.
-% For example, with the graphicx package use
-  \includegraphics{example.eps}
-% figure caption is below the figure
-\caption{Please write your figure caption here}
-\label{fig:1}       % Give a unique label
-\end{figure}
+%\section{Introduction}
+%\label{intro}
+%Your text comes here. Separate text sections with
+%\section{Section title}
+%\label{sec:1}
+%Text with citations \cite{RefB} and \cite{RefJ}.
+%\subsection{Subsection title}
+%\label{sec:2}
+%as required. Don't forget to give each section
+%and subsection a unique label (see Sect.~\ref{sec:1}).
+%\paragraph{Paragraph headings} Use paragraph headings as needed.
+%\begin{equation}
+%a^2+b^2=c^2
+%\end{equation}
 %
-% For two-column wide figures use
-\begin{figure*}
-% Use the relevant command to insert your figure file.
-% For example, with the graphicx package use
-  \includegraphics[width=0.75\textwidth]{example.eps}
-% figure caption is below the figure
-\caption{Please write your figure caption here}
-\label{fig:2}       % Give a unique label
-\end{figure*}
-%
-% For tables use
-\begin{table}
-% table caption is above the table
-\caption{Please write your table caption here}
-\label{tab:1}       % Give a unique label
-% For LaTeX tables use
-\begin{tabular}{lll}
-\hline\noalign{\smallskip}
-first & second & third  \\
-\noalign{\smallskip}\hline\noalign{\smallskip}
-number & number & number \\
-number & number & number \\
-\noalign{\smallskip}\hline
-\end{tabular}
-\end{table}
+%% For one-column wide figures use
+%\begin{figure}
+%% Use the relevant command to insert your figure file.
+%% For example, with the graphicx package use
+%  \includegraphics{example.eps}
+%% figure caption is below the figure
+%\caption{Please write your figure caption here}
+%\label{fig:1}       % Give a unique label
+%\end{figure}
+%%
+%% For two-column wide figures use
+%\begin{figure*}
+%% Use the relevant command to insert your figure file.
+%% For example, with the graphicx package use
+%  \includegraphics[width=0.75\textwidth]{example.eps}
+%% figure caption is below the figure
+%\caption{Please write your figure caption here}
+%\label{fig:2}       % Give a unique label
+%\end{figure*}
+%%
+%% For tables use
+%\begin{table}
+%% table caption is above the table
+%\caption{Please write your table caption here}
+%\label{tab:1}       % Give a unique label
+%% For LaTeX tables use
+%\begin{tabular}{lll}
+%\hline\noalign{\smallskip}
+%first & second & third  \\
+%\noalign{\smallskip}\hline\noalign{\smallskip}
+%number & number & number \\
+%number & number & number \\
+%\noalign{\smallskip}\hline
+%\end{tabular}
+%\end{table}
 
 
 %\begin{acknowledgements}
