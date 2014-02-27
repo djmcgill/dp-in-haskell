@@ -52,6 +52,12 @@ grestore
 % insert here the call for the packages your document requires
 %\usepackage{latexsym}
 \usepackage{epstopdf}
+\usepackage{float}
+\floatstyle{boxed}
+\restylefloat{table}
+\restylefloat{figure}
+
+\usepackage{listings}
 \usepackage{hyperref}
 % etc.
 %
@@ -131,7 +137,32 @@ Our preliminary results (unbounded knapsack in C and Haskell) show that while
 the C code is about four times faster, using Haskell for prototyping indeed
 offers significant advantages in terms of speed of development and eliminating
 certain classes of errors, without incurring a performance penalty that is
-unacceptable for a prototype. TODO: extend this, talk a little more about results
+unacceptable for a prototype.
+
+TODO: extend this, talk a little more about results and the actual code - compare loops vs folds and maps? This is where you convince people to read it
+
+
+
+
+Consider the following example from the knapsack implementations to find the Greatest Common Divisor (gcd) of an array of $n$ weights $w_i$ and the initial capacity $c$. The function $gcd$ (which takes two integers and returns the largest number which divides both of them) is associative, so $$ gcd (c, w_0, \ldots, w_{n-1}) =  gcd (c, gcd (w_0, gcd (\ldots, gcd (w_{n-2}, w_{n-1})\cdots))) $$ and the code needs to apply $gcd$ pairwise to the capacity and each weight, reducing them to a single integer after $n$ calls to $gcd$.
+
+\begin{figure}
+\label{fig:gcds:C99}
+\lstinputlisting[language=c, firstline=13, lastline=19]{code/gcds.c}
+\caption{C99}
+\end{figure}
+\begin{figure}
+\label{fig:gcds:java}
+\lstinputlisting[language=java, firstline=3, lastline=9]{code/gcds.java}
+\caption{Java}
+\end{figure}
+\begin{figure}
+\label{fig:gcds:haskell}
+\lstinputlisting[language=haskell, firstline=4, lastline=5]{code/gcds.hs}
+\caption{Haskell}
+\end{figure}
+
+
 
 TODO: Graph of results here? gcc -O2 vs ghc-O2 vs ghc -O2 -llvm vs clang -O2
 
