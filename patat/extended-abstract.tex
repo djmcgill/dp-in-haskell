@@ -116,13 +116,6 @@ and algorithms for combinatorial optimisation is one area where speed of
 development of correct code is already more important than absolute
 performance.
 
-As an example, there was a high profile case recently\cite{Herndon13} in which a
-software bug has caused erroneous results to be published, and to possibly influence European policy\footnote{\url{www.bbc.co.uk/news/magazine-22223190}}. Amongst other things, a cause of error was a range-indexing mistake in the spreadsheet which caused several countries to be excluded from the analysis.
-
-Consider the simplified example of summing a collection of numbers: in a high level programming language like Haskell one passes the name of a collection of numbers (whether an array, a list or otherwise) to the \emph{sum} function which will, behind the scenes and opaque to the user, index each element and add them together thus completely eliminating that class of errors. In most spreadsheet software however one has to manually select the cells (e.g. ``C3:C100'')\footnote{While named ranges do exist they still have to be manually specified which just pushes the problem elsewhere.} which is error-prone as well as being non-trivial to later expand to include additional data.
-
-TODO: talk about reasoning about code
-
 We use Haskell to implement standard dynamic programming algorithms, including
 bounded and unbounded knapsack, and column generation. Then we
 compare with implementations in Java and C in terms of speed, conciseness,
@@ -133,24 +126,33 @@ features (e.g., pointers, objects or laziness). The implementations are
 idiomatic and representative of an 'average' user, without non-portable micro-optimisations. In particular, standard libraries are used throughout for
 data structures, mathematics and floating-point arithmetic with as little as possible implemented by hand.
 
+TODO: talk about reasoning about code
+
+\section{Preliminary Results}
 Our preliminary results (unbounded knapsack in C and Haskell) show that while
 the C code is about four times faster, using Haskell for prototyping indeed
 offers significant advantages in terms of speed of development and eliminating
 certain classes of errors, without incurring a performance penalty that is
 unacceptable for a prototype.
 
+\section{Abstraction Of Common Patterns}
+As an example, there was a high profile case recently\cite{Herndon13} in which a
+software bug has caused erroneous results to be published, and to possibly influence European policy\footnote{\url{www.bbc.co.uk/news/magazine-22223190}}. Amongst other things, a cause of error was a range-indexing mistake in the spreadsheet which caused several countries to be excluded from the analysis.
+
+Consider the simplified example of summing a collection of numbers: in a high level programming language like Haskell one passes the name of a collection of numbers (whether an array, a list or otherwise) to the \emph{sum} function which will, behind the scenes and opaque to the user, index each element and add them together thus completely eliminating that class of errors. In most spreadsheet software however one has to manually select the cells (e.g. ``C3:C100'')\footnote{While named ranges do exist they still have to be manually specified which just pushes the problem elsewhere.} which is error-prone as well as being non-trivial to later expand to include additional data.
+
 Consider the following examples from the unbounded knapsack implementations to find the Greatest Common Divisor (gcd) of an array of $n$ weights, $\vec{W}$, and the initial capacity $c$. The function $gcd$ (which takes two integers and returns the largest integer which cleanly divides both of them) is associative, so $$ gcd (c, \vec{W}_0, \ldots, \vec{W}_{n-1}) =  gcd(gcd(\cdots gcd(gcd(c,\vec{W}_0),\vec{W}_1)\cdots),\vec{W}_{n-1}) $$ and the code needs to apply $gcd$ pairwise to the capacity and each weight, reducing them to a single integer after $n$ calls to $gcd$. The basic algorithm is demonstrated in the C implementation\ref{fig:gcds:c} - there exists an accumulator variable $gcd\_all$ which is initialised to $capacity$ and then $gcd$'d with each weight. Note that it was necessary to manually specify the bounds of the loop, index each element separately and then update the accumulator variable manually with the result of $gcd$ for each new $\vec{W}_i$.
 
-Looping over each element of an array is such a common task that in Java it has been abstracted over with the \emph{for-each} loop. This avoids the problem of having to manually specify the bounds of the loop or index into the array at the cost of a lack of flexibility - since the current index is not in scope as it would be inside a normal for loop, a for-each loop is not a good fit for code in which access to the index is required. In this case however, as shown in the Java implementation of gcds\ref{fig:gcds:java}, this is not necessary so using a for-each loop reduces the boilerplate that the user needs to type and hence the number of places that an error can appear. The accumulator variable still needed to be manually updated in each iteration however.
+In Java the task of iterating over each element has been abstracted into the \emph{for-each} loop. This avoids the problem of having to manually specify the bounds of the loop or index into the array at the cost of some flexibility. As shown in the Java implementation of gcds\ref{fig:gcds:java}, a for-each loop reduces the boilerplate that the user needs to type and hence the number of places that an error can appear.
 
-In Haskell the idiom of updating an accumulator variable with each element of a list using a binary function is abstracted over using the function $foldl'$ defined by $$foldl' (f, acc0, \vec{W}) = f(f(\cdots f(f(acc0,\vec{W}_0),\vec{W}_1)\cdots),\vec{W}_{n-1})$$ and so the Haskell definition of gcds\ref{fig:gcds:haskell} calls $foldl'$ with the function $gcd$, the initial accumulator value of $c$ and the vector $\vec{W}$ thus avoiding the need for the programmer to manually specify the range of the loop or how the accumulator should be updated.
+In Haskell the idiom of updating an accumulator variable with each element of a list using a binary function is abstracted over using the function \lstinline|foldl'| as shown in the Haskell definition\ref{fig:gcds:haskell}, thus avoiding the need for the programmer to manually specify the range of the loop or how the accumulator should be updated and further reducing the places in which an error can appear.
 
 
-TODO: benchmarking gcd isn't the whole story due to fusion etc
+TODO: make this way shorter
 
 \begin{figure}
 \label{fig:gcds:c}
-\lstinputlisting[language=c, firstline=13, lastline=19]{code/gcds.c}
+\lstinputlisting[language=c, firstline=5, lastline=11]{code/gcds.c}
 \caption{C99}
 \end{figure}
 \begin{figure}

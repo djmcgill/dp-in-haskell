@@ -1,6 +1,4 @@
 class GCDS {
-private int CAP = 84;
-private int[] WS = {26,90,65,32,84,78,69,77,58,85};
 
 public int gcds (int capacity, int[] weights) {
 	int gcd_all = capacity;
