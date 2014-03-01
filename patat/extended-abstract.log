@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012/Cygwin) (format=pdflatex 2013.3.17)  1 MAR 2014 11:07
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012/Cygwin) (format=pdflatex 2013.3.17)  1 MAR 2014 11:09
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -472,20 +472,30 @@ File: lstlang1.sty 2004/09/05 1.3 listings language file
 File: lstlang2.sty 2004/09/05 1.3 listings language file
 ) (./code/gcds.hs)
 (./extended-abstract.bbl)
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 242.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 244.
  [3]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 242.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 244.
  (./extended-abstract.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 242.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 242.
-Package rerunfilecheck Info: File `extended-abstract.out' has not changed.
-(rerunfilecheck)             Checksum: A276A4D81B8397E9D69A06F95F254205;119.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 242.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 244.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 244.
+
+
+Package rerunfilecheck Warning: File `extended-abstract.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+Package rerunfilecheck Info: Checksums for `extended-abstract.out':
+(rerunfilecheck)             Before: A276A4D81B8397E9D69A06F95F254205;119
+(rerunfilecheck)             After:  0CE96047E7E16BB98C316D6AB1393F9E;166.
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 244.
  ) 
 Here is how much of TeX's memory you used:
- 7770 strings out of 493488
- 114970 string characters out of 3146878
- 235217 words of memory out of 3000000
+ 7771 strings out of 493488
+ 114979 string characters out of 3146878
+ 236418 words of memory out of 3000000
  10921 multiletter control sequences out of 15000+200000
  34326 words of font info for 74 fonts, out of 3000000 for 9000
  957 hyphenation exceptions out of 8191
@@ -498,10 +508,10 @@ mr10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr
 st/fonts/type1/public/amsfonts/cm/cmtt8.pfb></usr/share/texmf-dist/fonts/type1/
 urw/times/utmb8a.pfb></usr/share/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></
 usr/share/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on extended-abstract.pdf (3 pages, 94257 bytes).
+Output written on extended-abstract.pdf (3 pages, 94276 bytes).
 PDF statistics:
- 108 PDF objects out of 1000 (max. 8388607)
- 92 compressed objects within 1 object stream
- 32 named destinations out of 1000 (max. 500000)
+ 109 PDF objects out of 1000 (max. 8388607)
+ 93 compressed objects within 1 object stream
+ 33 named destinations out of 1000 (max. 500000)
  17 words of extra memory for PDF output out of 10000 (max. 10000000)
 
