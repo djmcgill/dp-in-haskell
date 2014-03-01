@@ -1,0 +1,17 @@
+\begin{thebibliography}{1}
+\providecommand{\url}[1]{{#1}}
+\providecommand{\urlprefix}{URL }
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{DOI~\discretionary{}{}{}#1}\else
+  \providecommand{\doi}{DOI~\discretionary{}{}{}\begingroup
+  \urlstyle{rm}\Url}\fi
+
+\bibitem{Herndon13}
+Herndon, T., Ash, M., Pollin, R.: Does high public debt consistently stifle
+  economic growth? a critique of reinhart and rogoff.
+\newblock Cambridge Journal of Economics  (2013).
+\newblock \doi{10.1093/cje/bet075}.
+\newblock
+  \urlprefix\url{http://cje.oxfordjournals.org/content/early/2013/12/17/cje.bet075.abstract}
+
+\end{thebibliography}
