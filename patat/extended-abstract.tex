@@ -43,7 +43,12 @@
 %
 % please place your own definitions here and don't use \def but
 % \newcommand{}{}
-%
+
+\long\def\ignore#1{}
+\long\def\NOTE#1{{[[\bf{}NOTE: #1]]}}  
+\long\def\AJP#1{{[[\bf{}AJP: #1]]}}  
+% \let\NOTE=\ignore \let\AJP=\ignore  %% for final version
+
 % Insert the name of "your journal" with
 % \journalname{myjournal}
 %
@@ -98,6 +103,14 @@ In such cases, it would be useful to be able to take existing methods, specifica
 rapid prototyping, and tailor them to the kinds of algorithm classes used by the optimisation community.
 One such class of algorithms is dynamic programming, which can have many uses in scheduling and timetabling; either directly, or as a component within a other methods such as branch-and-cut or column generation.
 Here we report on initial investigations on potential advantages to using Functional Programming methods within such OR optimisation systems development.
+
+\AJP{in the above abstract: 
+
+need to fix the grammar
+
+say something about the actual results?
+}
+
 
 \keywords{Haskell \and C \and Java \and Functional Programming \and Dynamic Programming \and Language Comparison}
 % \PACS{PACS code1 \and PACS code2 \and more}
