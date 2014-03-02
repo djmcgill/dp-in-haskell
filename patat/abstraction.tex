@@ -1,0 +1,35 @@
+\section{Abstraction Of Common Patterns}
+As an example, there was a high profile case recently\cite{Herndon13} in which a
+software bug has caused erroneous results to be published, and to possibly influence European policy\footnote{\url{www.bbc.co.uk/news/magazine-22223190}}. Amongst other things, a cause of error was a range-indexing mistake in the spreadsheet which caused several countries to be excluded from the analysis.
+
+Consider the simplified example of summing a collection of numbers: in a high level programming language like Haskell one passes the name of a collection of numbers (whether an array, a list or otherwise) to the \emph{sum} function which will, behind the scenes and opaque to the user, index each element and add them together thus completely eliminating that class of errors. In most spreadsheet software however one has to manually select the cells (e.g. ``C3:C100'')\footnote{While named ranges do exist they still have to be manually specified which just pushes the problem elsewhere.} which is error-prone as well as being non-trivial to later expand to include additional data.
+
+Consider the following examples from the unbounded knapsack implementations to find the Greatest Common Divisor (gcd) of an array of $n$ weights, $\vec{W}$, and the initial capacity $c$. The function $gcd$ (which takes two integers and returns the largest integer which cleanly divides both of them) is associative, so $$ gcd (c, \vec{W}_0, \ldots, \vec{W}_{n-1}) =  gcd(gcd(\cdots gcd(gcd(c,\vec{W}_0),\vec{W}_1)\cdots),\vec{W}_{n-1}) $$ and the code needs to apply $gcd$ pairwise to the capacity and each weight, reducing them to a single integer after $n$ calls to $gcd$. The basic algorithm is demonstrated in the C implementation\ref{fig:gcds:c} - there exists an accumulator variable $gcd\_all$ which is initialised to $capacity$ and then $gcd$'d with each weight. Note that it was necessary to manually specify the bounds of the loop, index each element separately and then update the accumulator variable manually with the result of $gcd$ for each new $\vec{W}_i$.
+
+In Java the task of iterating over each element has been abstracted into the \emph{for-each} loop. This avoids the problem of having to manually specify the bounds of the loop or index into the array at the cost of some flexibility. As shown in the Java implementation of gcds\ref{fig:gcds:java}, a for-each loop reduces the boilerplate that the user needs to type and hence the number of places that an error can appear.
+
+In Haskell the idiom of updating an accumulator variable with each element of a list using a binary function is abstracted over using the function \lstinline|foldl'| as shown in the Haskell definition\ref{fig:gcds:haskell}, thus avoiding the need for the programmer to manually specify the range of the loop or how the accumulator should be updated and further reducing the places in which an error can appear.
+
+
+TODO: make this way shorter
+
+\begin{figure}
+\label{fig:gcds:c}
+\lstinputlisting[language=c, firstline=5, lastline=11]{code/gcds.c}
+\caption{C99}
+\end{figure}
+\begin{figure}
+\label{fig:gcds:java}
+\lstinputlisting[language=java, firstline=3, lastline=9]{code/gcds.java}
+\caption{Java 7}
+\end{figure}
+\begin{figure}
+\label{fig:gcds:haskell}
+\lstinputlisting[language=haskell, firstline=4, lastline=5]{code/gcds.hs}
+\caption{Haskell}
+\end{figure}
+
+
+
+TODO: Graph of knapsack results here? gcc -O2 vs ghc-O2
+

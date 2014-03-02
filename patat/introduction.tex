@@ -1,0 +1,23 @@
+\section{Introduction}
+
+Over the last decade the speed of computers has increased by many orders of
+magnitude but the speed of the typical programmer has not. In many cases it is far more important to quickly produce correct and robust
+code than to optimise code for performance, and as computers continue to
+become more powerful, while humans will essentially remain the same this is
+ultimately going to become the norm. We argue that prototyping new heuristics
+and algorithms for combinatorial optimisation is one area where speed of
+development of correct code is already more important than absolute
+performance.
+
+We use Haskell to implement standard dynamic programming algorithms, including
+bounded and unbounded knapsack, and column generation. Then we
+compare with implementations in Java and C in terms of speed, conciseness,
+modularity, as well as ease of parallelisation, refactoring, debugging and
+reasoning. To make the comparisons fair we keep the structure of the code
+similar across languages, except when taking advantage of specific language
+features (e.g., pointers, objects or laziness). The implementations are
+idiomatic and representative of an 'average' user, without non-portable micro-optimisations. In particular, standard libraries are used throughout for
+data structures, mathematics and floating-point arithmetic with as little as possible implemented by hand.
+
+TODO: talk about reasoning about code
+
