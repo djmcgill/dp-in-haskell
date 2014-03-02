@@ -9,14 +9,14 @@ the norm. We argue that prototyping new heuristics and algorithms for
 combinatorial optimisation is one area where speed of development of correct
 code is already more important than absolute performance.
 
-In this paper, we undertake a small case study as a preliminary investigation
+In this paper we undertake a small case study as a preliminary investigation
 into whether a declarative approach, specifically functional programming, is
-feasible for this domain and if it indeed can help speeding up prototyping.
+feasible for this domain and if it can indeed help speeding up prototyping.
 Our basic observation is that algorithms and heuristics for combinatorial
-optimisation at their core have clear mathematical specifications, but that
-implementation often is hampered by the need to spell out a plethora of
+optimisation, at their core, have clear mathematical specifications but that
+implementation is often hampered by the need to spell out a plethora of
 operational details which is time-consuming, error prone, and ultimately
-obscure the essence of the code. Thus, if combinatorial optimisation
+obscure the essence of the code. Thus if combinatorial optimisation
 algorithms at least could be prototyped by, for the most part, transliterating
 the mathematical specifications, and if the resulting performance were
 adequate for evaluation purposes, much would be gained already. Additionally,
@@ -31,10 +31,10 @@ have many uses in scheduling and timetabling, and as they for our purposes are
 representative of a larger class of algorithms in the domain of combinatorial
 optimisation. For the declarative implementation framework, we have opted to
 use the lazy functional language Haskell. This is because Haskell is a pure
-language which increasess the contrast to the imperative languages commonly
+language which increases the contrast to the imperative languages commonly
 used to implement this class of algorithms, making for a more interesting
-comparision. Further, Haskell is supported by mature, industrial-strength
-implementations, which makes for a fair comparision in terms of performance.
+comparison. Further, Haskell is supported by mature, industrial-strength
+implementations which makes for a fair comparison in terms of performance.
 
 
 As a
