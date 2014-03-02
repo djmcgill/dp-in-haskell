@@ -1,18 +1,38 @@
 \begin{abstract}
-In developing systems for combinatorial optimisation problems, 
-there are usually many different options for both the core algorithms themselves, 
-and also the data structures and other implementation details. 
-In such cases, it would be useful to be able to take existing methods, specifically functional programming methods, that support 
-rapid prototyping, and tailor them to the kinds of algorithm classes used by the optimisation community.
-One such class of algorithms is dynamic programming, which can have many uses in scheduling and timetabling; either directly, or as a component within a other methods such as branch-and-cut or column generation.
-Here we report on initial investigations on potential advantages to using Functional Programming methods within such OR optimisation systems development.
+
+This paper investigates the potential benefits offered by adopting a
+declarative approach, as embodied by modern functional languages with mature
+implementations, for prototyping algorithms for solving combinatorial
+optimisation problems. For this class of problems, there are usually many
+different options for the core algorithms, supporting data structures, and
+other implementation aspects. Thus, tools allowing different alternatives to
+be tried out quickly, focusing on the essence of the problem, and as
+unencumbered as possible by implementation detail, would be very useful. As a
+case study, we consider dynamic programming algorithms. These have many uses
+in scheduling and timetabling; either directly, or as a component within a
+other methods such as branch-and-cut or column generation. Our findings
+suggest that off-the-shelf, leading functional languages indeed can offer a
+range of compelling advantages in this particular problem domain, while
+yielding a performance that is adequate for verifying and evaluating the
+implemented algorithms as such.
+
+% In such cases, it
+% would be useful to be able to take existing methods, specifically functional
+% programming methods, that support rapid prototyping, and tailor them to the
+% kinds of algorithm classes used by the optimisation community. 
+% 
+% One such class
+% of algorithms is dynamic programming, which can have many uses in scheduling
+% and timetabling; either directly, or as a component within a other methods
+% such as branch-and-cut or column generation. Here we report on initial
+% investigations on potential advantages to using Functional Programming
+% methods within such OR optimisation systems development.
 
 \AJP{in the above abstract: 
-
-need to fix the grammar
-
-say something about the actual results?
+need to fix the grammar; say something about the actual results?
 }
+
+\NHN{Have reworked the grammar. Enough about results?}
 
 \keywords{Haskell \and C \and Java \and Functional Programming \and Dynamic Programming \and Language Comparison}
 % \PACS{PACS code1 \and PACS code2 \and more}
