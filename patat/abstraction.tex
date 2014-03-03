@@ -6,7 +6,7 @@ In a recent high profile case \cite{Herndon13}, a spreadsheet bug caused
 erroneous results from an economical analysis to be published, possibly
 influencing European policy%
 \footnote{\url{www.bbc.co.uk/news/magazine-22223190}}.
-The error was partly caused by an indexing mistake that accidentally excluded
+The error was caused in part by an indexing mistake that accidentally excluded
 several countries from the analysis, an example of operational details causing
 problems.
 
@@ -17,32 +17,29 @@ element-wise operations take place behind the scenes, completely eliminating
 indexing errors. By contrast, in most spreadsheets, the range of cells to
 be summed must be manually selected (e.g., ``C3:C100'')%
 \footnote{While named ranges do exist, they still have to be manually specified
-which just pushes the problem elsewhere.}.
-This is error-prone, especially if ranges later need to be modified to
-accommodate additional data.
+which just pushes the problem elsewhere.} which is error-prone.
 
 Let us consider how similar ideas might improve a combinatorial
 optimisation algorithm. Solving the unbounded knapsack problem involves
 finding the Greatest Common Divisor (gcd) of an array $\vec{W}$ of $n$
-weights. The function $gcd$ (which takes two integers and returns the
-largest integer dividing them both) is associative. Thus:
+weights. The function $gcd$ (which takes two strictly positive integers and returns the
+largest integer that divides them both) is associative. Thus:
 \[
 gcd (\vec{W}_0, \ldots, \vec{W}_{n-1}) =
-gcd(\vec{W}_0,gcd(\vec{W}_1, \ldots,gcd (\vec{W}_{n-2},\vec{W}_{n-1})\cdots))
+gcd(\vec{W}_0,gcd(\ldots,gcd (\vec{W}_{n-2},\vec{W}_{n-1})\cdots))
 \]
 As we can see, $gcd$ is applied pairwise to the capacity and each weight,
 reducing to a single integer after $n$ calls. Figure \ref{fig:gcds:java} shows
 the algorithm implemented in Java. Iteration over the elements has been
 abstracted into a \emph{for-each} loop, avoiding having to specify the bounds
-of the loop and explicit indexing into the array at the cost of some
-flexibility. The accumulator variable $gcd\_all$ is initialised to
+of the loop or explicitly index into the array. The accumulator variable $gcd\_all$ is initialised to
 $capacity$ and then $gcd$'d with each weight, updating the accumulator
-variable with the result of $gcd$ for each new $\vec{W}_i$. The C version of
+variable with the result of $gcd$ for each $\vec{W}_i$. The C version of
 the algorithm is almost identical, except that the indexing in that case has
 to be done explicitly, adding further operational details. We omit it for
 reasons of space.
 
-Figure \ref{fig:gcds:haskell}) shows the Haskell version. Here the idiom
+Figure \ref{fig:gcds:haskell} shows the Haskell version. Here the idiom
 of of reducing a list by a binary function and accumulator is captured
 by the function \lstinline|foldr1|. There is thus no need for the programmer
 to specify the range of the loop or how the accumulator should be updated,
