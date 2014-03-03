@@ -1,27 +1,75 @@
-\section{Abstraction Of Common Patterns}
-As an example, there was a high profile case recently\cite{Herndon13} in which a
-software bug has caused erroneous results to be published, and to possibly influence European policy\footnote{\url{www.bbc.co.uk/news/magazine-22223190}}. Amongst other things, a cause of error was a range-indexing mistake in the spreadsheet which caused several countries to be excluded from the analysis.
+% \section{Abstraction Of Common Patterns}
+% \section{Folds: an example of functional refactoring}
+\section{An Illustrative Example}
 
-Consider the simplified example of summing a collection of numbers: in a high level programming language like Haskell one passes the name of a collection of numbers (whether an array, a list or otherwise) to the \emph{sum} function which will, behind the scenes and opaque to the user, index each element and add them together thus completely eliminating that class of errors. In most spreadsheet software however one has to manually select the cells (e.g. ``C3:C100'')\footnote{While named ranges do exist they still have to be manually specified which just pushes the problem elsewhere.} which is error-prone as well as being non-trivial to later expand to include additional data.
+In a recent high profile case \cite{Herndon13}, a spreadsheet bug caused
+erroneous results from an economical analysis to be published, possibly
+influencing European policy%
+\footnote{\url{www.bbc.co.uk/news/magazine-22223190}}.
+The error was partly caused by an indexing mistake that accidentally excluded
+several countries from the analysis, an example of operational details causing
+problems.
 
-Consider the following examples from the unbounded knapsack implementations to find the Greatest Common Divisor (gcd) of an array of $n$ weights, $\vec{W}$. The function $gcd$ (which takes two integers and returns the largest integer which cleanly divides both of them) is associative, so $$ gcd (\vec{W}_0, \ldots, \vec{W}_{n-1}) =  gcd(\vec{W}_0,gcd(\vec{W}_1, \ldots,gcd (\vec{W}_{n-2},\vec{W}_{n-1})\cdots)) $$ and the code needs to apply $gcd$ pairwise to the capacity and each weight, reducing them to a single integer after $n$ calls to $gcd$. The basic algorithm is demonstrated in the C implementation (Fig. \ref{fig:gcds:c}) - there exists an accumulator variable $gcd\_all$ which is initialised to $capacity$ and then $gcd$'d with each weight. Note that it was necessary to manually specify the bounds of the loop, index each element separately and then update the accumulator variable manually with the result of $gcd$ for each new $\vec{W}_i$.
+As an analogy, consider summing a collection of numbers. In a declarative
+language like Haskell, the collection of numbers (whether an array, a list or
+otherwise) is simply passed to the \emph{sum} function. Indexing and
+element-wise operations take place behind the scenes, completely eliminating
+indexing errors. By contrast, in most spreadsheets, the range of cells to
+be summed must be manually selected (e.g., ``C3:C100'')%
+\footnote{While named ranges do exist, they still have to be manually specified
+which just pushes the problem elsewhere.}.
+This is error-prone, especially if ranges later need to be modified to
+accommodate additional data.
 
-In Java the task of iterating over each element has been abstracted into the \emph{for-each} loop. This avoids the problem of having to manually specify the bounds of the loop or index into the array at the cost of some flexibility. As shown in the Java implementation of gcds (Fig. \ref{fig:gcds:java}), a for-each loop reduces the boilerplate that the user needs to type and hence the number of places that an error can appear.
+Let us consider how similar ideas might improve a combinatorial
+optimisation algorithm. Solving the unbounded knapsack problem involves
+finding the Greatest Common Divisor (gcd) of an array $\vec{W}$ of $n$
+weights. The function $gcd$ (which takes two integers and returns the
+largest integer dividing them both) is associative. Thus:
+\[
+gcd (\vec{W}_0, \ldots, \vec{W}_{n-1}) =
+gcd(\vec{W}_0,gcd(\vec{W}_1, \ldots,gcd (\vec{W}_{n-2},\vec{W}_{n-1})\cdots))
+\]
+As we can see, $gcd$ is applied pairwise to the capacity and each weight,
+reducing to a single integer after $n$ calls. Figure \ref{fig:gcds:java} shows
+the algorithm implemented in Java. Iteration over the elements has been
+abstracted into a \emph{for-each} loop, avoiding having to specify the bounds
+of the loop and explicit indexing into the array at the cost of some
+flexibility. The accumulator variable $gcd\_all$ is initialised to
+$capacity$ and then $gcd$'d with each weight, updating the accumulator
+variable with the result of $gcd$ for each new $\vec{W}_i$. The C version of
+the algorithm is almost identical, except that the indexing in that case has
+to be done explicitly, adding further operational details. We omit it for
+reasons of space.
 
-In Haskell the idiom of updating an accumulator variable with each element of a list using a binary function is abstracted over using the function \lstinline|foldr1| as shown in the Haskell definition (Fig. \ref{fig:gcds:haskell}), thus avoiding the need for the programmer to manually specify the range of the loop or how the accumulator should be updated and further reducing the places in which an error can appear.
+Figure \ref{fig:gcds:haskell}) shows the Haskell version. Here the idiom
+of of reducing a list by a binary function and accumulator is captured
+by the function \lstinline|foldr1|. There is thus no need for the programmer
+to specify the range of the loop or how the accumulator should be updated,
+reducing the number of places where mistakes might be made.
 
-Furthermore, since the definition of $gcd$ contains the rule `\lstinline|gcd 1 _ = 1|' which states that $\forall x. gcd (1, x) = 1$, it can be said to be \emph{short-circuiting} i.e. if the first argument is equal to 1 then, due to lazy evaluation, the second argument is not inspected and is ignored. Therefore the $gcds$ will automatically stop once a $1$ is encountered without any change to the loop itself.
+Furthermore, since the definition of $gcd$ contains the rule
+`\lstinline|gcd 1 _ = 1|',
+which states that $\forall x. gcd (1, x) = 1$, it can be said to be
+\emph{short-circuiting}; i.e., if the first argument is equal to 1 then, due
+to lazy evaluation, the second argument is not inspected and is ignored.
+Therefore $gcds$ will automatically stop once a $1$ is encountered without any
+change to the loop itself. Achieving the same optimisation in Java (or C) wold
+require fusing the definition of $gcd$ with the loop code, which would break
+modularity, hamper reuse, and render the code significantly less readable.
 
-\begin{figure}
-\lstinputlisting[language=c, firstline=5, lastline=11]{code/gcds.c}
-\caption{C99}
-\label{fig:gcds:c}
-\end{figure}
+% \begin{figure}
+% \lstinputlisting[language=c, firstline=5, lastline=11]{code/gcds.c}
+% \caption{C99}
+% \label{fig:gcds:c}
+% \end{figure}
+
 \begin{figure}
 \lstinputlisting[language=java, firstline=3, lastline=9]{code/gcds.java}
 \caption{Java 7}
 \label{fig:gcds:java}
 \end{figure}
+
 \begin{figure}
 \lstinputlisting[language=haskell, firstline=3, lastline=9]{code/gcds.hs}
 \caption{Haskell}
