@@ -21,16 +21,16 @@ int main () {
 
 	bestAns = knapsack (cap, n, vws);
 	free (vws);
-    /*
+
 	// print answers
 	printf ("\nThe C solution is has a total weight of %i, a total value of %i and a selection of:\n",
 		bestAns.total_vw.weight, bestAns.total_vw.value);
-	*/
+
 	selection *current_selection, *tmp;
-	/*
+
 	HASH_ITER(hh, *(bestAns.selection_hashmap), current_selection, tmp) {
 		printf ("\tindex: %i, quantity: %i\n", current_selection->position, current_selection->quantity);
-	} */
+	}
 	// free bestAns.selection_hashmap
 	HASH_ITER(hh, *(bestAns.selection_hashmap), current_selection, tmp) {
 		HASH_DEL(*(bestAns.selection_hashmap), current_selection);
@@ -167,18 +167,10 @@ int cmp_vws (const void *arg1, const void *arg2) {
 	const vw_t *x = arg1;
 	const vw_t *y = arg2;
 
-	if (x->value > y->value) {
-		return 1;
-	} else if (x->value == y->value) {
-		if (x->weight < y->weight) {
-			return 1;
-		} else if (x->weight == y->weight) {
-			return 0;
-		} else {
-			return -1;
-		}
+	if (x->value == y->value) {
+		return y->weight - x->weight;
 	} else {
-		return -1;
+		return x->value - y->value;
 	}
 }
 
