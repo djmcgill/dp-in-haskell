@@ -11,72 +11,62 @@ code is already more important than absolute performance.
 
 In this paper, we undertake a small case study as a preliminary investigation
 into whether a declarative approach, specifically functional programming, is
-feasible for this domain and if it indeed can help speeding up prototyping.
+feasible for this domain, and if it indeed can help speeding up prototyping.
 Our basic observation is that algorithms and heuristics for combinatorial
 optimisation at their core have clear mathematical specifications, but that
 implementation often is hampered by the need to spell out a plethora of
-operational details which is time-consuming, error prone, and ultimately
+operational details. This is time-consuming, error prone, and ultimately
 obscure the essence of the code. Thus, if combinatorial optimisation
-algorithms at least could be prototyped by, for the most part, transliterating
-the mathematical specifications, and if the resulting performance were
-adequate for evaluation purposes, much would be gained already. Additionally,
-declaratively formulated code facilitates using techniques such as
-property-based testing \cite{quickcheck}, which has proved highly effective
-in many domains, and even to formally reason about code and prove aspects
-of it correct.
+algorithms could be prototyped by, for the most part, transliterating the
+mathematical specifications, and if the resulting performance were adequate
+for evaluation purposes, much would be gained already. Additionally,
+declaratively formulated code, as straightforward equational reasoning is
+valid, facilitates using techniques such as property-based testing
+\cite{quickcheck}, which has proved highly effective in many domains, and even
+formal reasoning and proving correctness.
 
 For our case study, we have opted to look at a few standard dynamic
-programming algorithms, including bounded and unbounded knapsack, as these
-have many uses in scheduling and timetabling, and as they for our purposes are
+programming algorithms, including bounded and unbounded knapsack. These have
+many uses in scheduling and timetabling, and, for our purposes, are
 representative of a larger class of algorithms in the domain of combinatorial
 optimisation. For the declarative implementation framework, we have opted to
-use the lazy functional language Haskell. This is because Haskell is a pure
-language which increasess the contrast to the imperative languages commonly
-used to implement this class of algorithms, making for a more interesting
-comparision. Further, Haskell is supported by mature, industrial-strength
-implementations, which makes for a fair comparision in terms of performance.
+use the pure, lazy, functional language Haskell \cite{Haskell98Book}. Using a
+pure language increases the contrast to the imperative languages commonly used
+to implement this class of algorithms, making for a more interesting
+comparison, while also allowing the specific advantages of working
+declaratively
+% Could say: "as discussed above", but being less specific means this could
+% also be taken to refer to other advantages such as being able to exploit 
+% laziness.
+to be fully realised. Further, Haskell is supported by mature,
+industrial-strength implementations, resulting in a fairer performance
+comparisons.
 
+We would like to emphasise that our aim is not to advocate any particular
+functional language for prototyping combinatorial optimisation algorithms.
+Rather, we are interested in exploring what advantages functional notation,
+broadly speaking, along with a mature implementation, can bring today.
+Further, it is worth pointing out that if these advantages are judged
+to be compelling enough, functional language implementations can,
+with relative ease, be leveraged for implementing domain-specific languages
+that allow domain-experts interested in working declaratively to reap
+the benefits of the approach without having to become seasoned functional
+programmers themselves \cite{Hudak1998}.
 
-As a
-case study, we consider dynamic programming algorithms. n. 
+We carry out the study by implementing each of the chosen algorithms in
+Haskell, Java, and C. These implementations are then along a number of
+dimensions, including conciseness, modularity, debugging, reasoning, and
+performance. To make the comparisons meaningful, we retain the structure the
+of the implementations across languages to the extent possible, except where
+we take advantage of specific language features (such as pointers, objects or
+laziness). The implementations are further idiomatic and representative of
+what an ``typical'' programmer might write, without non-portable
+micro-optimisations. In particular, standard libraries are used throughout for
+data structures and mathematical computations, with as little as possible
+implemented from scratch.
 
-
-
-Haskell is one extreme
-
-We use Haskell to implement standard dynamic programming algorithms, including
-bounded and unbounded knapsack, and column generation. Then we compare with
-implementations in Java and C in terms of speed, conciseness, modularity, as
-well as ease of parallelisation, refactoring, debugging and reasoning. To make
-the comparisons fair we keep the structure of the code similar across
-languages, except when taking advantage of specific language features (e.g.,
-pointers, objects or laziness). The implementations are idiomatic and
-representative of an 'average' user, without non-portable micro-optimisations.
-In particular, standard libraries are used throughout for data structures,
-mathematics and floating-point arithmetic with as little as possible
-implemented by hand.
-
-Our aim is not to advocate any particular functional language.
-Rather, it is about exploring what advantages functional notation
-along with a mature implementation can bring to the table today,
-out of the box, and which, if judged useful enough, with only
-a little extra effort could be made available to domain-experts
-without any particular background in FP, but who are interested
-in expressing themselves declaratively, through FP-based DSLs
-(with the mature FP implementations effectively being (part of)
-the backend execution machinery).
-
-One could strengthen that argument by citing some (E)DSL
-success stories.
-
-sophisticated off-the-shelf proprty-based testing tools like QuickCheck
-
-
-TODO: talk about reasoning about code
-
-Our findings
-suggest that off-the-shelf, leading functional languages indeed can offer a
-range of compelling advantages in this particular problem domain, while
-yielding a performance that is adequate for verifying and evaluating the
-implemented algorithms as such.
-
+Our findings so far suggest that functional languages supported by mature
+implementations indeed can speed up development by allowing implementations to
+stay close to specifications, taking advantage of specific language features
+such as laziness, and eliminating certain classes of errors, without incurring
+a performance penalty that is unacceptable for prototypes.
