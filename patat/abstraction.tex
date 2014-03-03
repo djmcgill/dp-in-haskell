@@ -10,7 +10,7 @@ In Java the task of iterating over each element has been abstracted into the \em
 
 In Haskell the idiom of updating an accumulator variable with each element of a list using a binary function is abstracted over using the function \lstinline|foldr1| as shown in the Haskell definition\ref{fig:gcds:haskell}, thus avoiding the need for the programmer to manually specify the range of the loop or how the accumulator should be updated and further reducing the places in which an error can appear.
 
-Furthermore, if the definition of $gcd$ contains the rule `\lstinline|gcd 1 x = 1|' it can be said to be \emph{short-circuiting}\footnote{Lazy in its second argument.} i.e. if the first argument is equal to 1 then, due to lazy evaluation, the second argument is not inspected and is ignored. Therefore $$gcd (1, gcd (\vec{W}_0,\ldots )) = 1$$ and the fold will \emph{automatically} short-circuit once a $1$ is encountered.
+Furthermore, since the definition of $gcd$ contains the rule `\lstinline|gcd 1 x = 1|' it can be said to be \emph{short-circuiting} i.e. if the first argument is equal to 1 then, due to lazy evaluation, the second argument is not inspected and is ignored. Therefore $$gcd (1, gcd (\vec{W}_0,\ldots )) = 1$$ and the loop will \emph{automatically} stop once a $1$ is encountered.
 
 \begin{figure}
 \label{fig:gcds:c}
@@ -24,7 +24,7 @@ Furthermore, if the definition of $gcd$ contains the rule `\lstinline|gcd 1 x = 
 \end{figure}
 \begin{figure}
 \label{fig:gcds:haskell}
-\lstinputlisting[language=haskell, firstline=1, lastline=2]{code/gcds.hs}
+\lstinputlisting[language=haskell, firstline=3, lastline=9]{code/gcds.hs}
 \caption{Haskell}
 \end{figure}
 
