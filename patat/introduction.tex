@@ -1,31 +1,34 @@
 \section{Introduction}
 
-Over the last decade the speed of computers has increased by many orders of
-magnitude but the speed of the typical programmer has not. In many cases it is
-far more important to quickly produce correct and robust code than to optimise
-code for performance, and as computers continue to become more powerful, while
-humans will essentially remain the same, this is ultimately going to become
-the norm. We argue that prototyping new heuristics and algorithms for
-combinatorial optimisation is one area where speed of development of correct
-code is already more important than absolute performance.
+Over the last decades, the speed of computers has increased by orders of
+magnitude, but the speed of programmers has not. It is often far more
+important to quickly produce correct and robust code than to optimise code for
+performance, and as computers continue to become more powerful, while humans
+will essentially remain the same, this is ultimately going to become the norm.
+We argue that prototyping new heuristics and algorithms for combinatorial
+optimisation is one area where speed of development of correct code is already
+more important than absolute performance.
 
 In this paper we undertake a small case study as a preliminary investigation
 into whether a declarative approach, specifically functional programming, is
-feasible for this domain, and if it indeed can help speeding up prototyping.
-Our basic observation is that algorithms and heuristics for combinatorial
+feasible for this domain, and if it can help speeding up prototyping. Our
+basic observation is that algorithms and heuristics for combinatorial
 optimisation at their core have clear mathematical specifications, but that
 implementation often is hampered by the need to spell out a plethora of
 operational details. This is time-consuming, error prone, and ultimately
 obscure the essence of the code. Thus, if combinatorial optimisation
 algorithms could be prototyped by, for the most part, transliterating the
 mathematical specifications, and if the resulting performance were adequate
-for evaluation purposes, much would be gained already. Additionally,
-declaratively formulated code, as straightforward equational reasoning is
-valid, facilitates using techniques such as property-based testing
-\cite{quickcheck}, which has proved highly effective in many domains, and even
-formal reasoning and proving correctness.
-
-\textbf{TODO:} Explain property-based testing and equational reasoning.
+for evaluation purposes, much would be gained already.
+% Additionally, declaratively formulated code, as straightforward equational
+% reasoning is valid, facilitates using techniques such as property-based
+% testing \cite{quickcheck}, which has proved highly effective in many domains,
+% and even formal reasoning and proving correctness.
+Additionally, because the elementary, ``school-book'' reasoning principle of
+substituting equals for equals is valid in declaratively formulated code
+(unlike in a setting with side effects), applying property-based testing
+\cite{quickcheck} (where test cases are derived automatically from stated
+correctness properties), and formally proving correctness, is facilitated.
 
 For our case study, we have opted to look at a few standard dynamic
 programming algorithms, including bounded and unbounded knapsack. These have
@@ -46,26 +49,26 @@ comparisons.
 
 We would like to emphasise that our aim is not to advocate any particular
 functional language for prototyping combinatorial optimisation algorithms.
-Rather, we are interested in exploring what advantages functional notation,
-broadly speaking, along with a mature implementation, can bring today.
-Further, it is worth pointing out that if these advantages are judged
-to be compelling enough, functional language implementations can,
-with relative ease, be leveraged for implementing domain-specific languages
-that allow domain-experts interested in working declaratively to reap
-the benefits of the approach without having to become seasoned functional
-programmers themselves \cite{Hudak1998}.
+Rather, we are interested in exploring what advantages functional notation
+supported by mature implementations can bring today. However, it is
+worth noting that if these
+advantages are judged to be compelling enough, functional
+language implementations can, with relative ease, be leveraged for
+implementing domain-specific languages that allow domain-experts interested in
+working declaratively to reap the benefits of the approach without having to
+become seasoned functional programmers themselves \cite{Hudak1998}.
 
 We carry out the study by implementing each of the chosen algorithms in
-Haskell, Java, and C. These implementations are then along a number of
-dimensions, including conciseness, modularity, debugging, reasoning, and
+Haskell, Java, and C. The implementations are then compared along a number
+of dimensions, including conciseness, modularity, debugging, reasoning, and
 performance. To make the comparisons meaningful, we retain the structure the
-of the implementations across languages to the extent possible, except where
-we take advantage of specific language features (such as pointers, objects or
-laziness). The implementations are further idiomatic and representative of
-what an ``typical'' programmer might write, without non-portable
-micro-optimisations. In particular, standard libraries are used throughout for
-data structures and mathematical computations, with as little as possible
-implemented from scratch.
+of the implementations across languages, except where we take advantage of
+specific language features (such as pointers, objects, or laziness). The
+implementations are further idiomatic and representative of what a
+``typical'' programmer might write, without non-portable micro-optimisations.
+In particular, standard libraries are used throughout for data structures and
+mathematical computations, with as little as possible implemented from
+scratch.
 
 % Our findings so far suggest that functional languages supported by mature
 % implementations indeed can speed up development by allowing implementations
