@@ -51,7 +51,7 @@ which states that $\forall x. gcd (1, x) = 1$, it can be said to be
 \emph{short-circuiting}; i.e., if the first argument is equal to 1 then, due
 to lazy evaluation, the second argument is not inspected and is ignored.
 Therefore $gcds$ will automatically stop once a $1$ is encountered without any
-change to the loop itself. Achieving the same optimisation in Java (or C) wold
+change to the loop itself. Achieving the same optimisation in Java (or C) would
 require fusing the definition of $gcd$ with the loop code, which would break
 modularity, hamper reuse, and render the code significantly less readable.
 
