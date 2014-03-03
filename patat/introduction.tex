@@ -16,7 +16,7 @@ basic observation is that algorithms and heuristics for combinatorial
 optimisation at their core have clear mathematical specifications, but that
 implementation often is hampered by the need to spell out a plethora of
 operational details. This is time-consuming, error prone, and ultimately
-obscure the essence of the code. Thus, if combinatorial optimisation
+obscures the essence of the code. Thus if combinatorial optimisation
 algorithms could be prototyped by, for the most part, transliterating the
 mathematical specifications, and if the resulting performance were adequate
 for evaluation purposes, much would be gained already.
@@ -24,21 +24,21 @@ for evaluation purposes, much would be gained already.
 % reasoning is valid, facilitates using techniques such as property-based
 % testing \cite{quickcheck}, which has proved highly effective in many domains,
 % and even formal reasoning and proving correctness.
-Additionally, because the elementary, ``school-book'' reasoning principle of
+Additionally because the elementary, ``school-book'' reasoning principle of
 substituting equals for equals is valid in declaratively formulated code
 (unlike in a setting with side effects), applying property-based testing
 \cite{quickcheck} (where test cases are derived automatically from stated
-correctness properties), and formally proving correctness, is facilitated.
+correctness properties), and formally proving correctness is facilitated.
 
-For our case study, we have opted to look at a few standard dynamic
+For our case study we have opted to look at a few standard dynamic
 programming algorithms, including bounded and unbounded knapsack. These have
-many uses in scheduling and timetabling, and, for our purposes, are
+many uses in scheduling and timetabling and, for our purposes, are
 representative of a larger class of algorithms in the domain of combinatorial
 optimisation. For the declarative implementation framework, we have opted to
 use the pure, lazy, functional language Haskell \cite{Haskell98Book}. Using a
 pure language increases the contrast to the imperative languages commonly used
 to implement this class of algorithms, making for a more interesting
-comparison, while also allowing the specific advantages of working
+comparison while also allowing the specific advantages of working
 declaratively
 % Could say: "as discussed above", but being less specific means this could
 % also be taken to refer to other advantages such as being able to exploit 
@@ -50,7 +50,7 @@ comparisons.
 We would like to emphasise that our aim is not to advocate any particular
 functional language for prototyping combinatorial optimisation algorithms.
 Rather, we are interested in exploring what advantages functional notation
-supported by mature implementations can bring today. However, it is
+supported by mature implementations can bring today. However it is
 worth noting that if these
 advantages are judged to be compelling enough, functional
 language implementations can, with relative ease, be leveraged for
@@ -61,7 +61,7 @@ become seasoned functional programmers themselves \cite{Hudak1998}.
 We carry out the study by implementing each of the chosen algorithms in
 Haskell, Java, and C. The implementations are then compared along a number
 of dimensions, including conciseness, modularity, debugging, reasoning, and
-performance. To make the comparisons meaningful, we retain the structure the
+performance. To make the comparisons meaningful we retain the structure the
 of the implementations across languages, except where we take advantage of
 specific language features (such as pointers, objects, or laziness). The
 implementations are further idiomatic and representative of what a
