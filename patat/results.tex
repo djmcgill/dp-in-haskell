@@ -1,8 +1,11 @@
-\section{Preliminary Results}
-Our preliminary results (unbounded knapsack in C and Haskell) show that while
-the C code is about four times faster, using Haskell for prototyping indeed
-offers significant advantages in terms of speed of development and eliminating
-certain classes of errors, without incurring a performance penalty that is
-unacceptable for a prototype.
+\section{Summary of Results}
+
+Our findings so far suggest that functional languages supported by mature
+implementations indeed can speed up development by allowing implementations to
+stay close to specifications, taking advantage of specific language features
+such as laziness, and eliminating certain classes of errors, without incurring
+a performance penalty that is unacceptable for prototypes. Our present
+benchmark results (unbounded knapsack in C and Haskell) suggest that the C
+code is not more than about four times faster that the Haskell version.
 
 TODO: Graph of knapsack results here? gcc -O2 vs ghc-O2
