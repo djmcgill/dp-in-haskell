@@ -22,28 +22,29 @@ which just pushes the problem elsewhere.} which is error-prone.
 Let us consider how similar ideas might improve a combinatorial
 optimisation algorithm. Solving the unbounded knapsack problem involves
 finding the Greatest Common Divisor (gcd) of an array $\vec{W}$ of $n$
-weights. The function $gcd$ (which takes two strictly positive integers and returns the
-largest integer that divides them both) is associative. Thus:
+weights. The function $gcd$
+%\footnote{Which takes two strictly positive integers and returns the largest integer that divides them both.}
+is associative. Thus:
 \[
 gcd (\vec{W}_0, \ldots, \vec{W}_{n-1}) =
 gcd(\vec{W}_0,gcd(\ldots,gcd (\vec{W}_{n-2},\vec{W}_{n-1})\cdots))
 \]
-As we can see, $gcd$ is applied pairwise to the capacity and each weight,
+Clearly, $gcd$ is applied pairwise to the capacity and each weight,
 reducing to a single integer after $n$ calls. Figure \ref{fig:gcds:java} shows
 the algorithm implemented in Java. Iteration over the elements has been
 abstracted into a \emph{for-each} loop, avoiding having to specify the bounds
 of the loop or explicitly index into the array. The accumulator variable $gcd\_all$ is initialised to
 $capacity$ and then $gcd$'d with each weight, updating the accumulator
 variable with the result of $gcd$ for each $\vec{W}_i$. The C version of
-the algorithm is almost identical, except that the indexing in that case has
-to be done explicitly, adding further operational details. We omit it for
+the algorithm is almost identical, except that the indexing and ranges in that case have
+to be written explicitly, adding further operational details. We omit it for
 reasons of space.
 
 Figure \ref{fig:gcds:haskell} shows the Haskell version. Here the idiom
 of of reducing a list by a binary function and accumulator is captured
 by the function \lstinline|foldr1|. There is thus no need for the programmer
-to specify the range of the loop or how the accumulator should be updated,
-reducing the number of places where mistakes might be made.
+to specify how the accumulator should be updated,
+further reducing the number of places where mistakes might be made.
 
 Furthermore, since the definition of $gcd$ contains the rule
 `\lstinline|gcd 1 _ = 1|',
