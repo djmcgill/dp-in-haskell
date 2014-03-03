@@ -21,22 +21,23 @@ int main () {
 
 	bestAns = knapsack (cap, n, vws);
 	free (vws);
-
+    /*
 	// print answers
 	printf ("\nThe C solution is has a total weight of %i, a total value of %i and a selection of:\n",
 		bestAns.total_vw.weight, bestAns.total_vw.value);
-
+	*/
 	selection *current_selection, *tmp;
+	/*
 	HASH_ITER(hh, *(bestAns.selection_hashmap), current_selection, tmp) {
 		printf ("\tindex: %i, quantity: %i\n", current_selection->position, current_selection->quantity);
-	}
+	} */
 	// free bestAns.selection_hashmap
 	HASH_ITER(hh, *(bestAns.selection_hashmap), current_selection, tmp) {
 		HASH_DEL(*(bestAns.selection_hashmap), current_selection);
 		free (current_selection);
 	}
 	free (bestAns.selection_hashmap);
-	return 0;
+	return bestAns.total_vw.weight;
 }
 
 void read_file (const char* const file_name,

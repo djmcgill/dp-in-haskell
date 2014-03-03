@@ -8,16 +8,4 @@ a performance penalty that is unacceptable for prototypes. Our present
 benchmark results (unbounded knapsack in C and Haskell) suggest that the C
 code is not more than about four times faster that the Haskell version.
 
-\textbf{TODO:} Graph of knapsack results here? gcc -O2 vs ghc-O2
-
-\textbf{TODO:} Work on the phrasing of the conclusions below.
-
-Our findings are backed up by the fact that a number of functional constructs such as first-class and anonymous functions, folds and pattern-matching have been added to object-orientated  languages like Java, C\#, Scala and C++. F\# and Clojure can interface seamlessly with C\# and Java respectively, and it's trivial to call C code from Haskell\cite{ffi} so the authors recommend that readers consider using these features in their OR prototypes and implementations.
-
-\DXM{Not happy with that last sentence.}
-
-Even if not intending to move to FP, then techniques originating from 
-FP, such as patterns for rules, and first class functions  along with 
-techniques such as fold, are making their way into "standard" languages 
-(Scala, F\#, etc) should be considered for use in OR prototypes and 
-implementations.
+There are a wide range of languages that provide a transition path to more functional code - features such as first-class and anonymous functions, folds and pattern-matching have been added to object-orientated languages like Java, C\#, Scala and C++. F\# and Clojure can interface seamlessly with C\# and Java respectively and it's trivial to call C code from Haskell\cite{ffi}, so it is simply not true to say that functional programming is an ivory tower or is disconnected from real-world applications. As such the authors recommend that readers consider using these features in their OR prototypes and implementations.

@@ -28,7 +28,7 @@ import qualified Data.Vector.Generic              as G
 import qualified Data.Vector.Generic.Mutable      as GM
 
 main = do
-    (cap, n, vws) <- readProblem "test_problem_1.data"
+    (cap, n, vws) <- readProblem "..\\test_problem_1.data"
     when (U.null vws) $ error "no value/weights found"
     printSolution $ knapsackNative (U.indexed vws) cap
 
