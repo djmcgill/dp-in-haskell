@@ -22,11 +22,10 @@ which just pushes the problem elsewhere.} which is error-prone.
 Let us consider how similar ideas might improve a combinatorial
 optimisation algorithm. Solving the unbounded knapsack problem involves
 finding the Greatest Common Divisor (gcd) of an array $\vec{W}$ of $n$
-weights. The function $gcd$
-%\footnote{Which takes two strictly positive integers and returns the largest integer that divides them both.}
+weights. The function $gcd$\footnote{Which takes two strictly positive integers and returns the largest integer that divides them both.}
 is associative. Thus:
 \[
-gcd (\vec{W}_0, \ldots, \vec{W}_{n-1}) =
+gcds (\vec{W}_0, \ldots, \vec{W}_{n-1}) =
 gcd(\vec{W}_0,gcd(\ldots,gcd (\vec{W}_{n-2},\vec{W}_{n-1})\cdots))
 \]
 Clearly, $gcd$ is applied pairwise to the capacity and each weight,
