@@ -28,7 +28,7 @@ import qualified Data.Vector.Generic              as G
 import qualified Data.Vector.Generic.Mutable      as GM
 
 main = do
-    (cap, n, vws) <- readProblem "..\\test_problem_1.data"
+    (cap, n, vws) <- readProblem "test_problem_1.data"
     when (U.null vws) $ error "no value/weights found"
     printSolution $ knapsackNative (U.indexed vws) cap
 
@@ -45,17 +45,18 @@ readProblem :: String -> IO (Weight, Int, U.Vector (Value, Weight))
 readProblem filename = do
     file <- B.readFile filename
     either error return $ eitherResult $ flip parse file $ do
-        cap <- decimal
-        space
-        n <- decimal
-        endOfLine
+        (cap, n) <- decPair
         vws <- U.replicateM n $ do
-            v <- decimal
-            space
-            w <- decimal
-            endOfLine
+            (v,w) <- decPair
             return (V v, W w)
         return (W cap, n, vws)
+    where
+    decPair = do
+        d1 <- decimal
+        space
+        d2 <- decimal
+        endOfLine
+        return (d1, d2)
 
 -- set up the newtypes including unboxed vectors of them
 newtype Value  = V {unV :: Int} deriving (Eq, Ord, Num, Real, Enum, Integral, Show, U.Unbox)
@@ -97,13 +98,11 @@ knapsackScaled vws (W cap) = V.unsafeIndex solns cap
     where
     -- a vector of the (memoised) best solution at each (scaled) weight
     solns :: V.Vector Solution
-    solns = flip evalState 0 $ V.generateM (cap+1) $ \(!i) -> do
+    solns = flip evalState 0 $ V.generateM (cap+1) $ \i -> do
         -- validWeights = U.takeWhile (\x -> getW x <= W i) vws
         -- but takes advantage of the fact that the slice is non-decreasing to memoise
         validWeights <- state $ \oldIx ->
-            let newIx = (oldIx +) . U.length
-                      . U.takeWhile (\x -> getW x <= W i)
-                      $ U.unsafeDrop oldIx vws
+            let newIx = oldIx + U.length (U.takeWhile (\x -> getW x <= W i) (U.unsafeDrop oldIx vws))
             in (U.unsafeTake newIx vws, newIx)
 
         -- Add the vw pair to the best solution of weight i-w and see that the new solution
@@ -112,5 +111,6 @@ knapsackScaled vws (W cap) = V.unsafeIndex solns cap
             eachPair (ix, (v, w)) = case solns `V.unsafeIndex` (i - unW w) of
                 Solution s' v' w' -> Solution (ix : s') (v' + v) (w' + w)
         return . V.foldl' max emptySoln
-               . V.generate (U.length validWeights)
-               $ eachPair . U.unsafeIndex validWeights
+               $ V.generate (U.length validWeights) (eachPair . U.unsafeIndex validWeights)
+               -- `map eachPair validWeighs' is parallelisable
+               -- `fold' max emptySoln' is probably parallelisable
