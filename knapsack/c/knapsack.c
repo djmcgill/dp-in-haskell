@@ -16,10 +16,14 @@ int main () {
 	collated_solution bestAns;
 	char* FILE_NAME = "test_problem_1.data";
 
+
+
 	read_file(FILE_NAME, &cap, &n, &vws);
+
 	qsort (vws, n, sizeof(vw_t), cmp_weight);
 
 	bestAns = knapsack (cap, n, vws);
+
 	free (vws);
 
 	// print answers
@@ -45,21 +49,29 @@ void read_file (const char* const file_name,
 	            int* restrict pN,
 	            vw_t** restrict pVWs) {
 	FILE *pFile;
-	int i = 0;
-	pFile = fopen ("test_problem_1.data","r");
+	pFile = fopen (file_name,"r");
+
+	if (pFile == NULL) {
+		printf ("Error: file \"%s\" not found", file_name);
+		exit(EXIT_FAILURE);
+	}
+
 	fscanf (pFile, "%i %i\n", pCap, pN);
 	assert (*pN > 0 && *pCap >= 0);
 
 	int n = *pN;
 	assert (n >= 0);
 	*pVWs = malloc (n * sizeof(vw_t));
+
+	int i = 0;
 	for (i = 0; i < n; i++) {
-		vw_t temp_vw;
-		// TODO: insert directly into pVW
-		fscanf (pFile, "%i %i\n", &(temp_vw.value), &(temp_vw.weight));
-		temp_vw.original_ix = i;
-		assert (temp_vw.value >= 0 && temp_vw.weight > 0);
-		(*pVWs)[i] = temp_vw;
+		fscanf (pFile,
+			    "%i %i\n",
+			    &((*pVWs)[i].value),
+			    &((*pVWs)[i].weight));
+
+		(*pVWs)[i].original_ix = i;
+		assert ((*pVWs)[i].value >= 0 && (*pVWs)[i].weight > 0);
 	}
 	fclose(pFile);
 }
@@ -154,11 +166,15 @@ int scale_by_gcd (int* capP, size_t n,
 
 	if (gcd_w != 1) {
 		// scale the weights by their gcd
+
 		*capP /= gcd_w;
+
 		for (i = 0; i < n; i++) {
 			vws[i].weight /= gcd_w;
 		}
+
 	}
+
 	return gcd_w;
 }
 
