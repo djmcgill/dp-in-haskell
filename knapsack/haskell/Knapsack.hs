@@ -112,5 +112,5 @@ knapsackScaled vws (W cap) = V.unsafeIndex solns cap
                 Solution s' v' w' -> Solution (ix : s') (v' + v) (w' + w)
         return . V.foldl' max emptySoln
                $ V.generate (U.length validWeights) (eachPair . U.unsafeIndex validWeights)
-               -- `map eachPair validWeighs' is parallelisable
+               -- `map eachPair validWeights' is parallelisable
                -- `fold' max emptySoln' is probably parallelisable
