@@ -15,21 +15,22 @@ public class Knapsack {
 		Path path = Paths.get(argv[0]);
 		Knapsack problem = new Knapsack (path);
 		Solution solution = problem.solve();
-		System.out.printf("\nThe Java solution is has a total weight of %i, a total value of %i and a selection of:\n"
+
+		//print out the solution
+		System.out.printf("\nThe Java solution is has a total weight of %d, a total value of %d and a selection of:\n"
 			             , solution.total_weight, solution.total_value);
 
 		Bag<Integer> chosenIndices = new Bag<Integer>(solution.selection);
 		for (Map.Entry<Integer, AtomicInteger> entry : chosenIndices.entries()) {
-			System.out.printf ("\tindex: %i, quantity: %i\n"
+			System.out.printf ("\tindex: %d, quantity: %d\n"
 				              ,entry.getKey()
-				              ,entry.getValue());
+				              ,entry.getValue().get());
 		}
 	}
 
 	public Knapsack (Path path) throws IOException, ParseException {
 		// turn a file into an instance of knapsack
 		// JAVA8: http://docs.oracle.com/javase/8/docs/api/java/nio/file/Files.html#lines-java.nio.file.Path-
-		// Path path = FileSystems.getDefault().getPath(stringPath);
 		List<String> lines = Files.readAllLines(path, Charset.defaultCharset());
 		if (lines.isEmpty()) {throw new ParseException("Empty file", 0);}
 
@@ -49,7 +50,7 @@ public class Knapsack {
 			}
 			int value = Integer.parseInt(valueAndWeight[0]);
 			int weight = Integer.parseInt(valueAndWeight[1]);
-			vws[i] = new VW(value, weight);
+			vws[i] = new VW(i, value, weight);
 		}
 	}
 
@@ -69,6 +70,9 @@ public class Knapsack {
 		solutions[0] = new Solution();
 		for (int i = 1; i <= capacity; i++) {
 			List<Solution> candidateSolutions = new LinkedList<Solution>();
+			// the empty solution is always available
+			candidateSolutions.add(new Solution());
+
 			for (int j = 0; j < n; j++) {
 				// let's see what this solution would look like
 
@@ -76,7 +80,7 @@ public class Knapsack {
 
 				int ix = i-vws[j].weight;
 				Solution tempSolution = new Solution(solutions[ix]);
-				tempSolution.chooseVW(j, vws[j]);
+				tempSolution.chooseVW(vws[j]);
 
 				candidateSolutions.add(tempSolution);
 			}
@@ -101,8 +105,8 @@ class Solution implements Comparable<Solution> {
 		total_weight = 0;
 	}
 
-	public void chooseVW (int ix, VW vw) {
-		selection.add(ix);
+	public void chooseVW (VW vw) {
+		selection.add(vw.index);
 		total_value += vw.value;
 		total_weight += vw.weight;
 	}
@@ -133,10 +137,12 @@ class Solution implements Comparable<Solution> {
 
 
 class VW {
+	public int index;
 	public int value;
 	public int weight;
 
-	public VW (int _value, int _weight) {
+	public VW (int _index, int _value, int _weight) {
+		index = _index;
 		value  = _value;
 		weight = _weight;
 	}

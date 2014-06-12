@@ -10,15 +10,16 @@
 
 #include <stdlib.h>
 
-int main () {
+int main (int argc, char* argv[]) {
+	if (argc != 2) {
+		printf ("Usage: %s <filename>", argv[0]);
+		exit(0);
+	}
 	int cap = 0, n = 0;
 	vw_t *vws = NULL;
 	collated_solution bestAns;
-	char* FILE_NAME = "test_problem_1.data";
 
-
-
-	read_file(FILE_NAME, &cap, &n, &vws);
+	read_file(argv[1], &cap, &n, &vws);
 
 	qsort (vws, n, sizeof(vw_t), cmp_weight);
 

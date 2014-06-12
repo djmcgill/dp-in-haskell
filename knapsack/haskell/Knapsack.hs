@@ -13,6 +13,8 @@ import           Data.List
 import           Data.Monoid
 import           Data.Ord
 import           Text.Printf
+import           System.Environment               (getArgs)
+import           System.Exit                      (exitSuccess)
 
 -- Parsing imports
 import           Data.Attoparsec.ByteString.Lazy
@@ -28,7 +30,11 @@ import qualified Data.Vector.Generic              as G
 import qualified Data.Vector.Generic.Mutable      as GM
 
 main = do
-    (cap, n, vws) <- readProblem "test_problem_1.data"
+    args <- getArgs
+    when (length args /= 1) $ do
+        putStrLn "Usage: Knapsack <filename>"
+        exitSuccess
+    (cap, n, vws) <- readProblem (head args)
     when (U.null vws) $ error "no value/weights found"
     printSolution $ knapsackNative (U.indexed vws) cap
 
