@@ -13,7 +13,7 @@ import           Data.List
 import           Data.Monoid
 import           Data.Ord
 import           Text.Printf
-import           System.Environment               (getArgs)
+import           System.Environment               (getArgs, getProgName)
 import           System.Exit                      (exitSuccess)
 
 -- Parsing imports
@@ -30,9 +30,10 @@ import qualified Data.Vector.Generic              as G
 import qualified Data.Vector.Generic.Mutable      as GM
 
 main = do
+    name <- getProgName
     args <- getArgs
     when (length args /= 1) $ do
-        putStrLn "Usage: Knapsack <filename>"
+        printf "Usage: %s <filename>" name
         exitSuccess
     (cap, n, vws) <- readProblem (head args)
     when (U.null vws) $ error "no value/weights found"
