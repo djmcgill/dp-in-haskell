@@ -1,45 +1,55 @@
 -- http://en.wikipedia.org/wiki/Longest_common_substring_problem
 -- uses sparse arrays
 
-import Prelude hiding (foldr)
-
+import Control.Lens
+import Control.Lens.Indexed (ifoldr)
+import qualified Data.Foldable as F
+import Data.List (foldl', sort)
 import Control.Monad
 
 import qualified Data.HashMap.Lazy as H
-import Data.Vector.Unboxed hiding (length, map, mapM_)
 import Data.Word
+import qualified Data.Vector as V
 
 import System.Environment (getArgs, getProgName)
 import System.Exit (exitSuccess)
 import Text.Printf
 
-type Index = Int -- #strings-1 ints
-fromString :: String -> Vector Char
-fromString = undefined
+import Debug.Trace
 
-toString :: Vector Char -> String
-toString = undefined
+type MyIndex = (Int,Int)
+
+{- main = do
+    let [s1, s2] = ["sdfaacrtgdv", "ergdfaacecsgw"]
+    printf "The Longest common substrings are:\n"
+    mapM_ (printf "\t%s\n") (findSubstrings s1 (lcs s1 s2)) -}
 
 main = do
     name <- getProgName
     args <- getArgs
     when (length args /= 2) $ do
-        printf "Usage: %s <string_1> <string_2>" name
+        printf "Usage: %s <string_1> <string_2>\n" name
         exitSuccess
-    let [s1, s2] =  map fromString args
-    printf "The Longest common substrings are\n:"
+    let [s1, s2] = args
+    printf "The longest common substrings are:\n"
     mapM_ (printf "\t%s\n") (findSubstrings s1 (lcs s1 s2))
 
 
-lcs :: Vector Char -> Vector Char -> H.HashMap Index Int
-lcs s1 s2 = foldr updateMemo H.empty s1
+lcs :: String -> String -> H.HashMap MyIndex Int
+-- fold over s1
+lcs s1 s2 = ifoldl updateMemo H.empty s1
     where
-    updateMemo :: Char -> H.HashMap Index Int -> H.HashMap Index Int
-    updateMemo c memo = ifoldr' (\ix c' -> if c == c' then updateAtIx ix else id) H.empty s2
-        where updateAtIx ix = H.insert ix (H.lookupDefault 0 (ix-1) memo)
+    -- fold over s2
+    updateMemo i memo c = ifoldr (\ix c' -> if c == c' then updateAtIx ix else id) memo s2
+        where
+        updateAtIx j = H.insert (i,j) (H.lookupDefault 0 oldK memo + 1) . H.delete oldK
+            where
+            oldK = (i-1, j-1)
 
-findSubstrings :: Vector Char -> H.HashMap Index Int -> [String]
-findSubstrings s indices = map (\(ix,n) -> toString (slice (ix-n) n s)) highest
+findSubstrings :: String -> H.HashMap MyIndex Int -> [String]
+findSubstrings s indices = map (\((ix,_),n) -> V.toList (V.slice (ix-n+1) n sVec)) highest
     where
-    highest :: [(Index, Int)]
-    highest = undefined
+    sVec = V.fromList s
+    -- could keep track of the highest rather than go through it each time
+    highest :: [(MyIndex, Int)]
+    highest = H.toList (H.filter (== F.maximum indices) indices)
