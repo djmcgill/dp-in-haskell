@@ -42,7 +42,7 @@ int main (int argc, char* argv[]) {
 		free (current_selection);
 	}
 	free (bestAns.selection_hashmap);
-	return bestAns.total_vw.weight;
+	return 0;
 }
 
 void read_file (const char* const file_name,

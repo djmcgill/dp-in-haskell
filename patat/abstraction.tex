@@ -26,8 +26,8 @@ finding the Greatest Common Divisor (gcd) of an array $\vec{W}$ of $n$
 weights. The function $gcd$\footnote{Which takes two strictly positive integers and returns the largest integer that divides them both.}
 is associative. Thus:
 \[
-gcds (\vec{W}_0, \ldots, \vec{W}_{n-1}) =
-gcd(\vec{W}_0,gcd(\ldots,gcd (\vec{W}_{n-2},\vec{W}_{n-1})\cdots))
+gcds (\vec{W}_1, \ldots, \vec{W}_n) =
+gcd(\vec{W}_1,gcd(\ldots,gcd (\vec{W}_{n-1},\vec{W}_n)\cdots))
 \]
 Clearly, $gcd$ is applied pairwise to the capacity and each weight,
 reducing to a single integer after $n - 1$ calls. Figure \ref{fig:gcds:java} shows
@@ -61,7 +61,10 @@ modularity, hamper reuse, and possibly rendering the code less readable.
 In this very small example, adding a check to see if $gcd\_all$ is equal to $1$ at each 
 iteration, and halting the loop if so, is a trivial change\footnote{Simply add `\lstinline|if (gcd_all == 1) \{break;\}|' as the first line in the loop.}
 but in larger programs, and ones in which the function inside the inner loop might change,
-this modification becomes less and less simple.
+this modification becomes less and less simple since the code governing the loop might be
+quite divorced from the code that updates the accumulator.
+
+\DXM{Still not sure on the wording of this part, I want to make it a cry to modularity.}
 
 \begin{figure}
 \lstinputlisting[language=java, firstline=3, lastline=9]{code/gcds.java}

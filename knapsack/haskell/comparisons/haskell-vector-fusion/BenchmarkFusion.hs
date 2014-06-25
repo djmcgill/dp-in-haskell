@@ -10,6 +10,7 @@ import           Text.Printf
 
 import qualified KnapsackCatMaybes as C
 import qualified KnapsackFusion as F
+import qualified KnapsackCatMaybesVec as V
 
 import Criterion.Config
 import Criterion.Main
@@ -18,8 +19,9 @@ main = do
     (cap, vws) <- readProblem "test_problem_1.data"
     defaultMainWith (defaultConfig{cfgSamples = ljust 10}) (return ()) [
         bcompare [
-            bench "knapsack-catMaybes" $ nf (C.solve vws) cap
-          , bench "knapsack-fusion" $ nf (F.solve vws) cap
+            --bench "knapsack-catMaybes" $ nf (C.solve vws) cap
+            bench "knapsack-fusion"    $ nf (F.solve vws) cap
+          , bench "knapsack-cm-vec"    $ nf (V.solve vws) cap
         ]]
 
 readProblem :: String -> IO (Int, [(Int,Int)])

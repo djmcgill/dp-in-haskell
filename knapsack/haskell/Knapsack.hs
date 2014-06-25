@@ -4,10 +4,8 @@
            , StandaloneDeriving
            #-}
 
-import           Control.Arrow                    (second)
-import           Control.Applicative
+import           Control.DeepSeq
 import           Control.Monad
-import           Control.Monad.State.Strict
 import qualified Data.IntMap.Strict               as I
 import           Data.List
 import           Data.Monoid
@@ -24,10 +22,6 @@ import qualified Data.ByteString.Lazy             as B
 -- Vector imports
 import qualified Data.Vector                      as V
 import qualified Data.Vector.Algorithms.Heap      as H
-import qualified Data.Vector.Unboxed              as U
-import qualified Data.Vector.Unboxed.Mutable      as UM
-import qualified Data.Vector.Generic              as G
-import qualified Data.Vector.Generic.Mutable      as GM
 
 main = do
     name <- getProgName
@@ -35,9 +29,9 @@ main = do
     when (length args /= 1) $ do
         printf "Usage: %s <filename>" name
         exitSuccess
-    (cap, n, vws) <- readProblem (head args)
-    when (U.null vws) $ error "no value/weights found"
-    printSolution $ knapsackNative (U.indexed vws) cap
+    (cap, _, vws) <- readProblem (head args)
+    when (V.null vws) $ error "no value/weights found"
+    printSolution $ knapsackNative vws cap
 
 printSolution :: Solution -> IO ()
 printSolution (Solution s (V v) (W w)) = do
@@ -48,14 +42,14 @@ countIxs :: [Int] -> I.IntMap Int
 countIxs = foldl' (\m i -> I.insertWith (+) i 1 m) I.empty
 
 -- Parse the problem from a file
-readProblem :: String -> IO (Weight, Int, U.Vector (Value, Weight))
+readProblem :: String -> IO (Weight, Int, V.Vector VW)
 readProblem filename = do
     file <- B.readFile filename
     either error return $ eitherResult $ flip parse file $ do
         (cap, n) <- decPair
-        vws <- U.replicateM n $ do
+        !vws <- V.forM (V.enumFromN 0 n) $ \i -> do
             (v,w) <- decPair
-            return (V v, W w)
+            return $! VW i (V v) (W w)
         return (W cap, n, vws)
     where
     decPair = do
@@ -66,20 +60,19 @@ readProblem filename = do
         return (d1, d2)
 
 -- set up the newtypes including unboxed vectors of them
-newtype Value  = V {unV :: Int} deriving (Eq, Ord, Num, Real, Enum, Integral, Show, U.Unbox)
-newtype Weight = W {unW :: Int} deriving (Eq, Ord, Num, Real, Enum, Integral, Show, U.Unbox)
-deriving instance (G.Vector   U.Vector   Value)
-deriving instance (GM.MVector UM.MVector Value)
-deriving instance (G.Vector   U.Vector   Weight)
-deriving instance (GM.MVector UM.MVector Weight)
-
-getW :: (Int, (Value, Weight)) -> Weight
-getW = snd . snd
+newtype Value  = V {unV :: Int} deriving (Eq, Ord, Num, Real, Enum, Integral, Show, NFData)
+newtype Weight = W {unW :: Int} deriving (Eq, Ord, Num, Real, Enum, Integral, Show, NFData)
 
 data Solution = Solution
     { selection   :: [Int]                  -- a list of chosen indices
     , totalValue  :: {-# UNPACK #-} !Value  -- the total value of the selection
     , totalWeight :: {-# UNPACK #-} !Weight -- the total weight of the selection
+    } deriving (Eq, Show)
+
+data VW = VW
+    { originalIx :: Int
+    , value      :: {-# UNPACK #-} !Value
+    , weight     :: {-# UNPACK #-} !Weight
     } deriving (Eq, Show)
 
 -- the best solution has the highest value or, in the case of a draw, the lowest weight
@@ -90,34 +83,25 @@ emptySoln :: Solution
 emptySoln = Solution [] 0 0
 
 -- sort out the params (scaling the weight and sorting the vws) before calling knapsackScaled
-knapsackNative :: U.Vector (Int, (Value, Weight)) -> Weight -> Solution
-knapsackNative vws cap = unscale $ knapsackScaled (scaleV (sortWeights vws)) (scale cap)
+knapsackNative :: V.Vector VW -> Weight -> Solution
+knapsackNative vws cap = unscale $ knapsackScaled (scaleVW (sortWeights vws)) (div cap gcdW)
     where
-    gcdW    = U.foldl' gcd cap $ U.map getW vws
-    scale x = div x gcdW
-    scaleV  = if gcdW /= 1 then U.map (second (second scale)) else id
+    !gcdW                    = V.foldl' gcd cap $ V.map weight vws
+    scaleWeight (VW ix v w)  = VW ix v (div w gcdW)
+    scaleVW                  = if gcdW /= 1 then V.map scaleWeight else id
     unscale (Solution s v w) = Solution s v (w*gcdW)
-    sortWeights = U.modify $ H.sortBy (comparing getW)
+    sortWeights              = V.modify $ H.sortBy (comparing weight)
 
 -- actually compute the solution
-knapsackScaled :: U.Vector (Int, (Value, Weight)) -> Weight -> Solution
+knapsackScaled :: V.Vector VW -> Weight -> Solution
 knapsackScaled vws (W cap) = V.unsafeIndex solns cap
     where
     -- a vector of the (memoised) best solution at each (scaled) weight
     solns :: V.Vector Solution
-    solns = flip evalState 0 $ V.generateM (cap+1) $ \i -> do
-        -- validWeights = U.takeWhile (\x -> getW x <= W i) vws
-        -- but takes advantage of the fact that the slice is non-decreasing to memoise
-        validWeights <- state $ \oldIx ->
-            let newIx = oldIx + U.length (U.takeWhile (\x -> getW x <= W i) (U.unsafeDrop oldIx vws))
-            in (U.unsafeTake newIx vws, newIx)
-
-        -- Add the vw pair to the best solution of weight i-w and see that the new solution
-        -- would look like. Please don't call it in a case where i < w or bad things will happen.
-        let eachPair :: (Int, (Value, Weight)) -> Solution
-            eachPair (ix, (v, w)) = case solns `V.unsafeIndex` (i - unW w) of
+    solns = V.generate (cap+1) $ \i ->
+        let eachPair :: VW -> Solution
+            eachPair (VW ix v w) = case solns `V.unsafeIndex` (i - unW w) of
                 Solution s' v' w' -> Solution (ix : s') (v' + v) (w' + w)
-        return . V.foldl' max emptySoln
-               $ V.generate (U.length validWeights) (eachPair . U.unsafeIndex validWeights)
-               -- `map eachPair validWeights' is parallelisable
-               -- `fold' max emptySoln' is probably parallelisable
+
+            valid vw = weight vw <= W i
+        in V.foldl' max emptySoln $ V.map eachPair $ V.takeWhile valid vws
