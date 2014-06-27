@@ -5,9 +5,11 @@ magnitude, but the speed of programmers has not. It is often far more
 important to quickly produce correct and robust code than to optimise code for
 performance, and as computers continue to become more powerful, while humans
 will essentially remain the same, this is ultimately going to become the norm.
-Prototyping new heuristics and algorithms for combinatorial optimisation is 
-arguably one area where speed of development of correct code is already more 
+Prototyping new heuristics and algorithms for combinatorial optimisation is
+arguably one area where speed of development of correct code is already more
 important than absolute performance.
+
+\AJP{Add comment that single core machines are NOT becoming more powerful, but have essentially stalled - instead the push is towards multi-core or even 1000s of cores on the cloud. Parallel code is notoriously hard to write and get correct. Better programming language support will become more essential.}
 
 In this paper we undertake a small case study as a preliminary investigation
 into whether a declarative approach, specifically functional programming, is
@@ -40,7 +42,7 @@ to implement this class of algorithms, making for a more interesting
 comparison while also allowing the specific advantages of working
 declaratively
 % Could say: "as discussed above", but being less specific means this could
-% also be taken to refer to other advantages such as being able to exploit 
+% also be taken to refer to other advantages such as being able to exploit
 % laziness.
 to be fully realised. Further, Haskell is supported by mature,
 industrial-strength implementations, resulting in a fairer performance
@@ -57,9 +59,11 @@ implementing domain-specific languages that allow domain-experts interested in
 working declaratively to reap the benefits of the approach without having to
 become seasoned functional programmers themselves \cite{Hudak1998}. One example
 of such a DSL, used to define and manipulate financial contracts,
-was produced by Simon Peyton Jones et al. \cite{contracts} and 
+was produced by Simon Peyton Jones et al. \cite{contracts} and
 a derivative of it is used in industry by companies such as Bloomberg
 and HSBC Private Bank\footnote{http://www.lexifi.com/quotes}.
+
+\AJP{TODO: say that the above are `executable specifications' ?}
 
 We carry out the study by implementing each of the chosen algorithms (unbounded
 knapsack and LCS) in
