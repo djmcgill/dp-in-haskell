@@ -28,13 +28,13 @@ Additionally because the elementary, ``school-book'' reasoning principle of
 substituting equals for equals is valid in declaratively formulated code
 (unlike in a setting with side effects), applying property-based testing
 \cite{quickcheck} (where test cases are derived automatically from stated
-correctness properties), more easily exploiting multi-core architectures, and formally proving correctness is potentially facilitated.
+correctness properties), more easily exploiting multi-core architectures, and formally proving correctness, are potentially facilitated.
 
-%We expect such issues to become even more important as optimisation methods move towards making effective usage of multi-core %machines with the associated challenges of debugging 
+%We expect such issues to become even more important as optimisation methods move towards making effective usage of multi-core %machines with the associated challenges of debugging
 
-For our case study we have opted to look at a few standard dynamic
-programming algorithms, specifically unbounded knapsack and longest common substring. These have
-many uses in scheduling and timetabling and, for our purposes, are
+For our case study, we have opted to look at a few standard dynamic
+programming algorithms, specifically unbounded knapsack and longest common substring (LCS). These have
+many uses and, for our purposes, are
 representative of a larger class of algorithms in the domain of combinatorial
 optimisation. We have opted to
 use the pure, lazy, functional language Haskell \cite{Haskell98Book} as our declarative implementation framework. Using a pure language increases the contrast to the imperative languages commonly used
@@ -51,7 +51,7 @@ comparison.
 We would like to emphasise that our aim is not to advocate any particular
 functional language for prototyping combinatorial optimisation algorithms.
 Rather, we are interested in exploring what advantages functional notation
-supported by mature implementations can bring today. However it is
+supported by mature implementations can bring today. However, it is
 worth noting that if these
 advantages are judged to be compelling enough, functional
 language implementations can, with relative ease, be leveraged for
