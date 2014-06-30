@@ -9,8 +9,6 @@ Prototyping new heuristics and algorithms for combinatorial optimisation is
 arguably one area where speed of development of correct code is already more
 important than absolute performance.
 
-\AJP{Add comment that single core machines are NOT becoming more powerful, but have essentially stalled - instead the push is towards multi-core or even 1000s of cores on the cloud. Parallel code is notoriously hard to write and get correct. Better programming language support will become more essential.}
-
 In this paper we undertake a small case study as a preliminary investigation
 into whether a declarative approach, specifically functional programming, is
 feasible for this domain and if it can help speed up prototyping. Our
@@ -55,21 +53,18 @@ supported by mature implementations can bring today. However it is
 worth noting that if these
 advantages are judged to be compelling enough, functional
 language implementations can, with relative ease, be leveraged for
-implementing domain-specific languages that allow domain-experts interested in
+implementing domain-specific languages (sometimes referred to as `executable specifications') that allow domain-experts interested in
 working declaratively to reap the benefits of the approach without having to
 become seasoned functional programmers themselves \cite{Hudak1998}. One example
 of such a DSL, used to define and manipulate financial contracts,
 was produced by Simon Peyton Jones et al. \cite{contracts} and
 a derivative of it is used in industry by companies such as Bloomberg
-and HSBC Private Bank\footnote{http://www.lexifi.com/quotes}.
-
-\AJP{TODO: say that the above are `executable specifications' ?}
+and HSBC Private Bank.
 
 We carry out the study by implementing each of the chosen algorithms (unbounded
 knapsack and LCS) in
 Haskell, Java, and C. The implementations are then compared along a number
-of dimensions, including conciseness, modularity, debugging, reasoning, and
-performance. To make the comparisons meaningful we retain the structure the
+of dimensions, including conciseness, modularity, performance, and ease of debugging, reasoning, and parallelising. To make the comparisons meaningful we retain the structure the
 of the implementations across languages, except where we take advantage of
 specific language features (such as pointers, objects, or laziness). The
 implementations are further idiomatic and representative of what a

@@ -1,7 +1,6 @@
 % \section{Abstraction Of Common Patterns}
 % \section{Folds: an example of functional refactoring}
 \section{An Illustrative Example}
-
 In a recent high profile case \cite{Herndon13}, a spreadsheet bug caused
 erroneous results from an economical analysis to be published, possibly
 influencing European Union policy%
@@ -11,9 +10,9 @@ several countries from the analysis, an example of operational details causing
 problems.
 
 As an analogy, consider summing a collection of numbers. In a declarative
-language like Haskell\footnote{Or similar concepts like Java 8's streams.}
-the numbers (whether in the form of an array, a list or
-otherwise) are simply passed to the \emph{sum} function. Indexing and
+setting
+the numbers (whether in the form of an array, list, stream, or
+otherwise) are simply passed to a generic \emph{sum} function. Indexing and
 element-wise operations take place behind the scenes, completely eliminating
 these as possible sources of programmer error. By contrast, in most spreadsheets, the range of cells to
 be summed must be manually selected (e.g., ``C3:C100'')%
@@ -23,29 +22,20 @@ which just pushes the problem elsewhere.} which is error-prone.
 Let us consider how similar ideas might improve a combinatorial
 optimisation algorithm. Solving the unbounded knapsack problem involves
 finding the Greatest Common Divisor (gcd) of an array $\vec{W}$ of $n$
-weights. The function $gcd$\footnote{Which takes two strictly positive integers and returns the largest integer that divides them both.}
-is associative. Thus:
-\[
-gcds (\vec{W}_1, \ldots, \vec{W}_n) =
-gcd(\vec{W}_1,gcd(\ldots,gcd (\vec{W}_{n-1},\vec{W}_n)\cdots))
-\]
-Clearly, $gcd$ is applied pairwise to the capacity and each weight,
-reducing to a single integer after $n - 1$ calls. Figure \ref{fig:gcds:java} shows
+weights and the initial capacity. The function $gcd$\footnote{Which takes two strictly positive integers and returns the largest integer that divides them both.}
+is associative, thus it is applied pairwise to the capacity and each weight,
+reducing to a single integer after $n$ calls. Figure \ref{fig:gcds:java} shows
 the algorithm implemented in Java 7. Iteration over the elements has been
-abstracted into a \emph{for-each} loop, avoiding having to specify the bounds
-of the loop or explicitly index into the array. The accumulator variable $gcd\_all$ is initialised to
-$capacity$ and then $gcd$'d with each weight, updating the accumulator
+abstracted into a \emph{for-each} loop. The accumulator variable $gcd\_all$ is initialised to $capacity$ and then $gcd$'d with each weight, updating the accumulator
 variable with the result of $gcd$ for each $\vec{W}_i$. The C version of
-the algorithm in figure \ref{fig:gcds:c} is almost identical, except that the indices
-and loop ranges have to be written explicitly, adding further operational details and 
-increasing the possibility for an error to creep in.
+the algorithm (omitted for space reasons) is almost identical, except that the indices and loop ranges have to be written explicitly, adding further
+operational details.
 
 Figure \ref{fig:gcds:haskell} shows the Haskell version. Here the idiom
-of of reducing a list by a binary function and accumulator is captured
+of reducing a list by a binary function and accumulator is captured
 by the function \lstinline|foldr1|, so called because it folds,
 associating to the right, over a list with at least one element. There is thus no 
-need for the user to specify how and when the accumulator should be updated,
-further reducing the number of places where mistakes might be made.
+need for the user to specify how and when the accumulator should be updated.
 
 Furthermore, since the definition of $gcd$ contains the rule
 `\lstinline|gcd 1 _ = 1|',
@@ -56,15 +46,10 @@ Therefore $gcds$ will automatically stop once a $1$ is encountered without any
 change to the loop itself. Achieving the same optimisation in Java (or C) would
 require changing the code for the loop itself, fusing into it some amount of the code
 for $gcd$ itself, which would break
-modularity, hamper reuse, and possibly rendering the code less readable.
-
-In this very small example, adding a check to see if $gcd\_all$ is equal to $1$ at each 
-iteration, and halting the loop if so, is a trivial change\footnote{Simply add `\lstinline|if (gcd_all == 1) \{break;\}|' as the first line in the loop.}
-but in larger programs, and ones in which the function inside the inner loop might change,
-this modification becomes less and less simple since the code governing the loop might be
-quite divorced from the code that updates the accumulator.
-
-\DXM{Still not sure on the wording of this part, I want to make it a cry to modularity.}
+modularity, hamper reuse, and possibly rendering the code less readable. In this very small example, adding a check to see if $gcd\_all$ is equal to $1$ at each 
+iteration, and halting the loop if so, is a trivial change but in larger programs, and ones in which the function inside the inner loop might not be so trivial or static,
+this modification becomes less and less simple since the code that governs the loop might be
+quite divorced from the code that updates the accumulating variable.
 
 \begin{figure}
 \lstinputlisting[language=java, firstline=3, lastline=9]{code/gcds.java}
@@ -72,14 +57,14 @@ quite divorced from the code that updates the accumulator.
 \label{fig:gcds:java}
 \end{figure}
 
-\begin{figure}
-\lstinputlisting[language=c, firstline=5, lastline=11]{code/gcds.c}
-\caption{C99}
-\label{fig:gcds:c}
-\end{figure}
+%\begin{figure}
+%\lstinputlisting[language=c, firstline=5, lastline=11]{code/gcds.c}
+%\caption{C99}
+%\label{fig:gcds:c}
+%\end{figure}
 
 \begin{figure}
-\lstinputlisting[language=haskell, firstline=3, lastline=9]{code/gcds.hs}
-\caption{Haskell (including the definition for $gcd$)}
+\lstinputlisting[language=haskell, firstline=8, lastline=9]{code/gcds.hs}
+\caption{Haskell}
 \label{fig:gcds:haskell}
 \end{figure}
