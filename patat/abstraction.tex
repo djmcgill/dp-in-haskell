@@ -6,18 +6,15 @@ erroneous results from an economical analysis to be published, possibly
 influencing European Union policy%
 \footnote{\url{www.bbc.co.uk/news/magazine-22223190}}.
 The error was caused in part by an indexing mistake that accidentally excluded
-several countries from the analysis, an example of operational details causing
+several countries from the analysis, a clear example of operational details causing
 problems.
-
 As an analogy, consider summing a collection of numbers. In a declarative
 setting
 the numbers (whether in the form of an array, list, stream, or
 otherwise) are simply passed to a generic \emph{sum} function. Indexing and
 element-wise operations take place behind the scenes, completely eliminating
 these as possible sources of programmer error. By contrast, in most spreadsheets, the range of cells to
-be summed must be manually selected (e.g., ``C3:C100'')%
-\footnote{While named ranges do exist, they still have to be manually specified
-which just pushes the problem elsewhere.} which is error-prone.
+be summed are manually selected (e.g., ``C3:C100'') which can be error-prone.
 
 
 Let us consider how similar ideas might improve a combinatorial
@@ -26,15 +23,15 @@ optimisation algorithm.
 % knapsack and LCS, but then seems to forget them
 Lack of space precludes describing the full results of Knapsack and LCS, however, solving the unbounded knapsack problem involves finding the Greatest Common Divisor (gcd) of an array $\vec{W}$ of $n$
 weights and the initial capacity. The function $gcd$\footnote{Which takes two strictly positive integers and returns the largest integer that divides them both.}
-is associative, thus it is applied pairwise to the capacity and each weight,
+is associative. Thus to get the gcd of the $n+1$ numbers, first the gcd of the capacity and $W_0$ is calculated, then the gcd of that number and $W_1$, and so on for each $W_i$,
 reducing to a single integer after $n$ calls. Figure \ref{fig:gcds:java} shows
 the algorithm implemented in Java 7. Iteration over the elements has been
 abstracted into a \emph{for-each} loop. The accumulator variable $gcd\_all$ is initialised to $capacity$ and then $gcd$'d with each weight, updating the accumulator
 variable with the result of $gcd$ for each $\vec{W}_i$. The C version of
-the algorithm (omitted for space reasons) is almost identical, except that the indices and loop ranges have to be written explicitly, adding further
+the algorithm is almost identical, except that the indices and loop ranges have to be written explicitly, adding further
 operational details.
 
-Figure \ref{fig:gcds:haskell} shows the Haskell version. Here the idiom
+The Haskell version of $gcd$ is shown in figure \ref{fig:gcds:haskell}. Here the idiom
 of reducing a list by a binary function and accumulator is captured
 by the function \lstinline|foldr1|, so called because it folds,
 associating to the right, over a list with at least one element. There is thus no 
@@ -51,7 +48,7 @@ require changing the code for the loop itself, fusing into it some amount of the
 for $gcd$ itself, which would break
 modularity, hamper reuse, and possibly rendering the code less readable. In this very small example, adding a check to see if $gcd\_all$ is equal to $1$ at each 
 iteration, and halting the loop if so, is a trivial change but in larger programs, and ones in which the function inside the inner loop might not be so trivial or static,
-this modification becomes less and less simple since the code that governs the loop might be
+this modification becomes less and less simple. This is because the code that governs the loop might be
 quite divorced from the code that updates the accumulating variable.
 
 \begin{figure}
