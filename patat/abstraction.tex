@@ -15,8 +15,6 @@ otherwise) are simply passed to a generic \emph{sum} function. Indexing and
 element-wise operations take place behind the scenes, completely eliminating
 these as possible sources of programmer error. By contrast, in most spreadsheets, the range of cells to
 be summed are manually selected (e.g., ``C3:C100'') which can be error-prone.
-
-
 Let us consider how similar ideas might improve a combinatorial
 optimisation algorithm. 
 % AJP: had to add the start of the following sentence otherwise the paper promises 
@@ -30,13 +28,11 @@ abstracted into a \emph{for-each} loop. The accumulator variable $gcd\_all$ is i
 variable with the result of $gcd$ for each $\vec{W}_i$. The C version of
 the algorithm is almost identical, except that the indices and loop ranges have to be written explicitly, adding further
 operational details.
-
 The Haskell version of $gcd$ is shown in figure \ref{fig:gcds:haskell}. Here the idiom
 of reducing a list by a binary function and accumulator is captured
 by the function \lstinline|foldr1|, so called because it folds,
 associating to the right, over a list with at least one element. There is thus no 
 need for the user to specify how and when the accumulator should be updated.
-
 Furthermore, since the definition of $gcd$ contains the rule
 `\lstinline|gcd 1 _ = 1|',
 which states that $\forall x. gcd (1, x) = 1$, it can be said to be
@@ -44,11 +40,10 @@ which states that $\forall x. gcd (1, x) = 1$, it can be said to be
 to lazy evaluation, the second argument is not inspected and is ignored.
 Therefore $gcds$ will automatically stop once a $1$ is encountered without any
 change to the loop itself. Achieving the same optimisation in Java (or C) would
-require changing the code for the loop itself, fusing into it some amount of the code
-for $gcd$ itself, which would break
-modularity, hamper reuse, and possibly rendering the code less readable. In this very small example, adding a check to see if $gcd\_all$ is equal to $1$ at each 
-iteration, and halting the loop if so, is a trivial change but in larger programs, and ones in which the function inside the inner loop might not be so trivial or static,
-this modification becomes less and less simple. This is because the code that governs the loop might be
+require changing the code for the loop itself by fusing it with part of the code $gcd$. This would break
+modularity, hamper reuse, and possibly render the code less readable.
+In this very small example, adding a check to see if $gcd\_all$ is equal to $1$ at each 
+iteration and halting the loop if so is a trivial change. However, had the loop or the called function been more involved, the modification would have been correspondingly harder because the code that governs the loop might be
 quite divorced from the code that updates the accumulating variable.
 
 \begin{figure}
