@@ -1,7 +1,7 @@
 \section{Introduction}
 
 Over the last few decades, the speed of computers has increased by orders of
-magnitude, but the speed of programmers has not. It is often far more
+magnitude, but the productivity of programmers has not kept pace. It is often far more
 important to quickly produce correct and robust code than to optimise code for
 performance, and as computers continue to become more powerful, while humans
 will essentially remain the same, this is ultimately going to become the norm.
@@ -9,7 +9,7 @@ Prototyping new heuristics and algorithms for combinatorial optimisation is
 arguably one area where speed of development of correct code is already more
 important than absolute performance.
 
-In this paper we undertake a small case study as a preliminary investigation
+We undertook a small case study as a preliminary investigation
 into whether a declarative approach, specifically functional programming, is
 feasible for this domain and if it can help speed up prototyping. Our
 basic observation is that algorithms and heuristics for combinatorial
@@ -28,11 +28,13 @@ Additionally because the elementary, ``school-book'' reasoning principle of
 substituting equals for equals is valid in declaratively formulated code
 (unlike in a setting with side effects), applying property-based testing
 \cite{quickcheck} (where test cases are derived automatically from stated
-correctness properties), and formally proving correctness is facilitated.
+correctness properties), more easily exploiting multi-core architectures, and formally proving correctness, are potentially facilitated.
 
-For our case study we have opted to look at a few standard dynamic
-programming algorithms, specifically unbounded knapsack and longest common substring. These have
-many uses in scheduling and timetabling and, for our purposes, are
+%We expect such issues to become even more important as optimisation methods move towards making effective usage of multi-core %machines with the associated challenges of debugging
+
+For our case study, we have opted to look at a few standard dynamic
+programming algorithms, specifically unbounded knapsack and longest common substring (LCS). These have
+many uses and, for our purposes, are
 representative of a larger class of algorithms in the domain of combinatorial
 optimisation. We have opted to
 use the pure, lazy, functional language Haskell \cite{Haskell98Book} as our declarative implementation framework. Using a pure language increases the contrast to the imperative languages commonly used
@@ -49,7 +51,7 @@ comparison.
 We would like to emphasise that our aim is not to advocate any particular
 functional language for prototyping combinatorial optimisation algorithms.
 Rather, we are interested in exploring what advantages functional notation
-supported by mature implementations can bring today. However it is
+supported by mature implementations can bring today. However, it is
 worth noting that if these
 advantages are judged to be compelling enough, functional
 language implementations can, with relative ease, be leveraged for

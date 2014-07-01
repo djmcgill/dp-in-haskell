@@ -19,9 +19,12 @@ be summed must be manually selected (e.g., ``C3:C100'')%
 \footnote{While named ranges do exist, they still have to be manually specified
 which just pushes the problem elsewhere.} which is error-prone.
 
+
 Let us consider how similar ideas might improve a combinatorial
-optimisation algorithm. Solving the unbounded knapsack problem involves
-finding the Greatest Common Divisor (gcd) of an array $\vec{W}$ of $n$
+optimisation algorithm. 
+% AJP: had to add the start of the following sentence otherwise the paper promises 
+% knapsack and LCS, but then seems to forget them
+Lack of space precludes describing the full results of Knapsack and LCS, however, solving the unbounded knapsack problem involves finding the Greatest Common Divisor (gcd) of an array $\vec{W}$ of $n$
 weights and the initial capacity. The function $gcd$\footnote{Which takes two strictly positive integers and returns the largest integer that divides them both.}
 is associative, thus it is applied pairwise to the capacity and each weight,
 reducing to a single integer after $n$ calls. Figure \ref{fig:gcds:java} shows
