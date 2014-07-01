@@ -21,8 +21,8 @@ Let us consider how similar ideas might improve a combinatorial
 optimisation algorithm. 
 % AJP: had to add the start of the following sentence otherwise the paper promises 
 % knapsack and LCS, but then seems to forget them
-Lack of space precludes describing the full results of Knapsack and LCS, however, solving the unbounded knapsack problem involves finding the Greatest Common Divisor (gcd) of an array $\vec{W}$ of $n$
-weights and the initial capacity. The function $gcd$\footnote{Which takes two strictly positive integers and returns the largest integer that divides them both.}
+Lack of space precludes describing the full results of Knapsack and LCS, however, solving the unbounded knapsack problem involves finding the Greatest Common Divisor (gcd) of the initial capacity and an array $\vec{W}$ of $n$
+weights. The function $gcd$\footnote{Which takes two strictly positive integers and returns the largest integer that divides them both.}
 is associative. Thus to get the gcd of the $n+1$ numbers, first the gcd of the capacity and $W_0$ is calculated, then the gcd of that number and $W_1$, and so on for each $W_i$,
 reducing to a single integer after $n$ calls. Figure \ref{fig:gcds:java} shows
 the algorithm implemented in Java 7. Iteration over the elements has been
