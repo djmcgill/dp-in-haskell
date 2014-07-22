@@ -1,0 +1,37 @@
+\section{Unbounded Knapsack}
+The unbounded knapsack problem for non-negative integer values and positive integer weights is formulated as such:
+
+\begin{equation*}\begin{aligned}
+&\text{maximise}   & & \sum_{i \eq 1}^{n} v_i x_i \\
+&\text{subject to} & & x_i \in \mathbb{N}, \\
+&                  & & \sum_{i \eq 1}^{n} w_i x_i \leq W
+\end{aligned}\end{equation*}
+
+i.e. the $i$th item that can be placed in the knapsack has a value ($v_i$) and a weight $w_i$. Without the total weight going over the knapsack's capacity $W$, pick any non-negative integer number of each item such that the total value is maximised. The unbounded knapsack problem is NP-complete\cite{np-complete}. The dynamic programming algorithm used to solve it here is pseudo-polynomial --- it has complexity $O(n*W)$.
+
+\subsection{Design}
+The (standard) algorithm used constructs the highest-value valid knapsack for each weight  $\in [0,W]$. The best (and only) solution for weight $0$ is the empty solution and the best solution for each other weight is found by attempting to add each value/weight to the previous best solution that it fits in. Clearly then the solution for the overall problem is the solution for weight $W$.
+
+Some additional optimisations are as follows:
+\begin{itemize}
+\item To reduce the number of weights that are considered, each weight and the capacity are divided by their combined $gcd$. Thus if every weight and the capacity are even, this will roughly half the time taken.
+\item The array of items are sorted by their weight so that, once a item is found that has a weight higher than the current capacity and thus cannot fit, all heavier weights are also discarded.
+\end{itemize}
+
+\subsection{Implementation}
+\subsubsection{Parsing}
+\subsubsection{Initialisation}
+\subsubsection{Main loops}
+\subsubsection{Finalisation}
+Combine the index selections into a bag
+
+\subsection{Performance}
+%LLVM 2.9
+%ghc 7.6.3
+%clang 2.9
+%javac 1.7.0_51
+%java 1.7.0_55
+
+\subsection{Extension}
+memoisation
+

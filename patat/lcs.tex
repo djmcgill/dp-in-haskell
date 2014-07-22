@@ -1,0 +1,23 @@
+\section{Longest Common Substring}
+TODO: talk about LCS with side-by-side code comparisons.
+
+Design choices: using sparse matrices (huge waste of memory with large strings, worst case the same - bad things will happen on a collision though), but not saving substrings in it, just indices since it doesn't make much difference and is simpler.
+
+Three main code sections: initialisation, filling the hashtable of collisions, and retrieving the substrings.
+
+\subsection{Initialisation}
+Is uninteresting in all three languages, mostly just reading from the arguments to main and calling the library function for an empty hashtable.
+
+\subsection{Filling the Hashtable}
+foreach c1 in s1:
+	foreach c2 in s2:
+		if c1 == c2 then delete previous entry, add new entry
+		
+choice of hash - in haskell everything is automatic, in java you have to specify what to do, in c you have to do it yourself
+
+\subsection{Retrieving substrings}
+find the longest runs of collisions in the table: loop through and find the highest - 1 line in haskell, a loop in java and c
+find the corresponding substring inside s1
+
+\subsection{Performance}
+profile, compare w/ dense matrices if time, 
